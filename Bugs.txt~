@@ -27,7 +27,6 @@ perdi=# insert into salario values (2158770, 'M', 222222222222222222222222222222
 Abortado (imagem do núcleo gravada)
 
 ------------------------------------------------------------------------------------
-
 4) Após a inserção de numeros muito grandes, o banco encontrou problemas ao ler os 
 metadados; //Isso aconteceu após a tentativa de inserção do bug3, que abortou o 
 programa mas o banco recebeu a entrada.
@@ -58,7 +57,6 @@ perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=#
 ------------------------------------------------------------------------------------
 6) Ao inserir apóstrofos na linha de comando, o banco não responde a nenhum comando 
 e fica nisso até que se insira outro apóstrofo.
->>>>>>> 4891c9dea6159991653a935523efa91b9396b763
 
 perdi=# '''''''
 ''''''
@@ -93,37 +91,4 @@ RROR: syntax error.
 perdi=# 
 
 ------------------------------------------------------------------------------------
-9) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
-tabelas, o nome não aparece completo, ao tentar excluir não foi possível e ao tentar 
-inserir valores ocorreu falha de segmentação.
-
-perdi=# create table perdi_mais_uma_vez_testando_quantidade (cod integer primary key, nome varchar(20));
-CREATE TABLE
-perdi=# \d
-		List of Relations
- Schema     | Name            | Type       | Owner     
-------------+-----------------+------------+-------
- public     | ambulatorio     | tuple      | ibetres   
- public     | medico          | tuple      | ibetres   
- public     | paciente        | tuple      | ibetres   
- public     | consulta        | tuple      | ibetres   
- public     | funcionario     | tuple      | ibetres   
- public     | salario         | tuple      | ibetres   
- public     | perdi_mais_uma_vez_t | tuple      | ibetres   
-(7 rows)
-
-perdi=# drop table perdi_mais_uma_vez_testando_quantidade;
-ERROR: table "perdi_mais_uma_vez_testando_quantidade" does not exist.
-perdi=# 
-
-perdi=# insert into perdi_mais_uma_vez_testando_quantidade values (12,'adad');       
-ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
-ERROR: INSERT has more expressions than target columns.
-Falha de segmentação (imagem do núcleo gravada)
-
-8) Retorno de erro errado ao usar áspas duplas:
-
-uffsdb=# insert into funcionario values (1000000, "Oi", 21, "Trindade", 1234567890123456.11111);
-"Expected token "VALUES" after object name.
-ERROR: syntax error.
 
