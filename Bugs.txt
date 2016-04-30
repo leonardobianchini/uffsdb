@@ -1,0 +1,30 @@
+----------------------------------------BUGS----------------------------------------
+
+------------------------------------------------------------------------------------
+1) Não detecta erro ao tentar inserir uma string num char;
+
+perdi=# insert into salario values (2158750, 'Masculino', 2540.50);
+INSERT 0 1
+perdi=# select * from salario;
+ rg         | sexo       | salario    
+------------+------------+------------
+ 2158750    | M          | 2540.500000 
+
+(1 row)
+
+------------------------------------------------------------------------------------
+2) Falha de segmentação ao tentar inserir chave estrangeira invalida;
+
+perdi=# insert into salario values (2343543, 'Feminino', 1321432.332);
+ERROR: invalid reference to "funcionario.rg". The value "2343543" does not exist.
+Falha de segmentação (imagem do núcleo gravada)
+
+------------------------------------------------------------------------------------
+3) Banco abortado após tentar inserir um valor grande dentro de um double;
+
+perdi=# insert into salario values (2158770, 'M', 22222222222222222222222222222222222222222222222);
+*** stack smashing detected ***: ./uffsdb terminated
+Abortado (imagem do núcleo gravada)
+
+
+
