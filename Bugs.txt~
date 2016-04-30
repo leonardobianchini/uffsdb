@@ -82,3 +82,13 @@ perdi=# ]]]]}}}}^[]^[]^[]^[]
 !#!@!##!@perdi=# 
 perdi=#
 
+------------------------------------------------------------------------------------
+8) Ao clicar em uma seta(qualquer direção) e der enter, printa RROR onde deveria ser 
+ERROR;
+
+perdi=# ^[[B
+RROR: syntax error.
+perdi=# 
+
+------------------------------------------------------------------------------------
+

@@ -82,3 +82,40 @@ perdi=# ]]]]}}}}^[]^[]^[]^[]
 !#!@!##!@perdi=# 
 perdi=#
 
+------------------------------------------------------------------------------------
+8) Ao clicar em uma seta(qualquer direção) e der enter, printa RROR onde deveria ser 
+ERROR;
+
+perdi=# ^[[B
+RROR: syntax error.
+perdi=# 
+
+------------------------------------------------------------------------------------
+9) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
+tabelas, o nome não aparece completo, ao tentar excluir não foi possível e ao tentar 
+inserir valores ocorreu falha de segmentação.
+
+perdi=# create table perdi_mais_uma_vez_testando_quantidade (cod integer primary key, nome varchar(20));
+CREATE TABLE
+perdi=# \d
+		List of Relations
+ Schema     | Name            | Type       | Owner     
+------------+-----------------+------------+-------
+ public     | ambulatorio     | tuple      | ibetres   
+ public     | medico          | tuple      | ibetres   
+ public     | paciente        | tuple      | ibetres   
+ public     | consulta        | tuple      | ibetres   
+ public     | funcionario     | tuple      | ibetres   
+ public     | salario         | tuple      | ibetres   
+ public     | perdi_mais_uma_vez_t | tuple      | ibetres   
+(7 rows)
+
+perdi=# drop table perdi_mais_uma_vez_testando_quantidade;
+ERROR: table "perdi_mais_uma_vez_testando_quantidade" does not exist.
+perdi=# 
+
+perdi=# insert into perdi_mais_uma_vez_testando_quantidade values (12,'adad');       
+ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
+ERROR: INSERT has more expressions than target columns.
+Falha de segmentação (imagem do núcleo gravada)
+
