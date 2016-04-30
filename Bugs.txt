@@ -46,3 +46,39 @@ perdi=# select * from salario;
 (6 rows)
 
 
+------------------------------------------------------------------------------------
+5) O nome do banco repete-se conforme o numero de ";" inseridos em seguida na linha 
+de comando;
+
+perdi=# ;;;;
+perdi=# perdi=# perdi=# perdi=# ;;;;;;;;;
+perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# 
+
+------------------------------------------------------------------------------------
+6) Ao inserir apóstrofos na linha de comando, o banco não responde a nenhum comando 
+e fica nisso até que se insira outro apóstrofo.
+
+perdi=# '''''''
+''''''
+linha
+teste
+bug
+select * from salario;
+\q
+nao sai do bug
+só inserindo outro apóstrfo
+;;
+;
+
+'
+ERROR: syntax error.
+
+------------------------------------------------------------------------------------
+7) Ao inserir caracteres invalidos, o sgbd repete esses caracteres e não identifica 
+erro algum, seguindo normalmente como se nada estivesse acontecendo.
+
+perdi=# ]]]]}}}}^[]^[]^[]^[]
+]]]]}}}}]]]]perdi=# !#!@!##!@
+!#!@!##!@perdi=# 
+perdi=#
+
