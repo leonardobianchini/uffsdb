@@ -26,5 +26,12 @@ perdi=# insert into salario values (2158770, 'M', 222222222222222222222222222222
 *** stack smashing detected ***: ./uffsdb terminated
 Abortado (imagem do núcleo gravada)
 
+------------------------------------------------------------------------------------
+4) Retorno de erro errado ao usar áspas duplas:
+
+uffsdb=# insert into funcionario values (1000000, "Oi", 21, "Trindade", 1234567890123456.11111);
+"Expected token "VALUES" after object name.
+ERROR: syntax error.
+
 
 
