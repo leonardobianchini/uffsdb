@@ -136,28 +136,13 @@ void help() {
 }
 ////
 int objcmp(char *obj, char *str) {
-	char *object, *string;
-	int i;
-
-	object = (char *)malloc(sizeof(char)*TAMANHO_NOME_CAMPO);
-	string = (char *)malloc(sizeof(char)*TAMANHO_NOME_CAMPO);
-	memset(object, '\0', TAMANHO_NOME_CAMPO);
-	memset(string, '\0', TAMANHO_NOME_CAMPO);
-
-	for (i = 0; i < strlen(obj); i++)
-		object[i] = tolower(obj[i]);
-	object[i] = '\0';
-
-	for (i = 0; i < strlen(str); i++)
-		string[i] = tolower(str[i]);
-	string[i] = '\0';
-
-	i = strcmp(object, string);
-
-	free(object);
-	free(string);
-
-	return i;
+    int i;
+    
+    for (i=0;obj[i]  && str[i] ;i++){
+        if(tolower(obj[i])-tolower(str[i]))
+            return tolower(obj[i])-tolower(str[i]);
+    }
+    return tolower(obj[i])-tolower(str[i]);
 }
 
 void strcpylower(char *dest, char *src) {
@@ -253,5 +238,3 @@ double convertD(char u[]) {
 void clear() {
 	system("clear");
 }
-
-

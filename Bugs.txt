@@ -129,7 +129,7 @@ uffsdb=# insert into funcionario values (1000000, "Oi", 21, "Trindade", 12345678
 ERROR: syntax error.
 
 ------------------------------------------------------------------------------------
-11) Falha de segmentação ao errar o nome da exclusão do banco de dados, 
+[DONE] 11) Falha de segmentação ao errar o nome da exclusão do banco de dados, 
 quando o mesmo não existe:
 
 uffsdb (15.1).
