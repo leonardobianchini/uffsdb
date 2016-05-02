@@ -121,9 +121,30 @@ ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
 ERROR: INSERT has more expressions than target columns.
 Falha de segmentação (imagem do núcleo gravada)
 
-8) Retorno de erro errado ao usar áspas duplas:
+------------------------------------------------------------------------------------
+10) Retorno de erro errado ao usar áspas duplas:
 
 uffsdb=# insert into funcionario values (1000000, "Oi", 21, "Trindade", 1234567890123456.11111);
 "Expected token "VALUES" after object name.
 ERROR: syntax error.
 
+------------------------------------------------------------------------------------
+11) Falha de segmentação ao errar o nome da exclusão do banco de dados, 
+quando o mesmo não existe:
+
+uffsdb (15.1).
+Type "help" for help.
+
+You are now connected to database "uffsdb" as user "uffsdb".
+uffsdb=# \l
+ 					List of databases
+       Name  	    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges  
+--------------------+----------+----------+-------------+-------------+-----------------------
+uffsdb              | uffsdb  | UTF8     | pt_BR.UTF-8 | pt_BR.UTF-8 | 
+(1 row)
+
+
+
+uffsdb=# drop database ajsgdajghsdjahsdghgdahsdgajhsdghasgdhasgdhasdhjasdhjasgdhjagsdjgsdjahsgdjagd;
+*** Error in `./uffsdb': free(): invalid next size (fast): 0x00000000009343f0 ***
+Abortado
