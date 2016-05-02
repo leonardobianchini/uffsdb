@@ -93,7 +93,7 @@ RROR: syntax error.
 perdi=# 
 
 ------------------------------------------------------------------------------------
-9) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
+[DONE] 9) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
 tabelas, o nome não aparece completo, ao tentar excluir não foi possível e ao tentar 
 inserir valores ocorreu falha de segmentação.
 

@@ -908,6 +908,12 @@ int verifyFieldName(char **fieldName, int N){
 
 //////
 void createTable(rc_insert *t) {
+    if(strlen(t->objName) > TAMANHO_NOME_TABELA){
+        printf("ERROR: The tables name is to long\n");
+        return;
+    }
+    
+    
 	int size;
     strcpylower(t->objName, t->objName);        //muda pra minúsculo
     char *tableName = (char*) malloc (sizeof(char)*TAMANHO_NOME_TABELA),
