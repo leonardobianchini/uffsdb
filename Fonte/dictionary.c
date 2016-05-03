@@ -766,7 +766,7 @@ void printTable(char *tbl){
 		while(fgetc (dicionario) != EOF){
 			fseek(dicionario, -1, 1);
 			fread(tupla, sizeof(char), TAMANHO_NOME_TABELA, dicionario);
-			printf(" %-10s | %-15s | %-10s | %-10s\n", "public", tupla, "tuple", "ibetres");
+			printf(" %-10s | %-15s | %-10s | %-10s\n", "public", tupla, "tuple", connected.db_name);
 			fseek(dicionario, 28, 1);
 			i++;
 		}
