@@ -14,4 +14,3 @@ A simple teaching DBMS
 
 # Bugs
 Os bugs encontrados estão listados no arquivo Bugs.txt
-Os erros corrigidos estão com uma tag:[DONE] antes do seu número
