@@ -22,6 +22,8 @@ uffsdb=# drop database ajsgdajghsdjahsdghgdahsdgajhsdghasgdhasgdhasdhjasdhjasgdh
 *** Error in `./uffsdb': free(): invalid next size (fast): 0x00000000009343f0 ***
 Abortado
 
+A comparação das strings na função int objcmp(char *obj, char *str) do arquivo misc.c
+não funcionava corretamente. Foi concertada testando caractere por caractere.
 
 ------------------------------------------------------------------------------------
 12) O nome do dono das tabelas está fixo, com o nome ibetres:
@@ -38,8 +40,11 @@ perdi=# \d
  public     | salario         | tuple      | ibetres    
 (6 rows)
 
+Bastou mudar o valor fixo por connected.db_name em void printTable(char *tbl) do arquivo dictionary.c.
+
 ------------------------------------------------------------------------------------
 13) Há alguns vazamentos de memória nos arquivos misc.c e sqlcommands.c.
+Apenas foi adicionado free() antes de alguns returns.
 
 ------------------------------------------------------------------------------------
 9) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
@@ -69,6 +74,10 @@ perdi=# insert into perdi_mais_uma_vez_testando_quantidade values (12,'adad');
 ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
 ERROR: INSERT has more expressions than target columns.
 Falha de segmentação (imagem do núcleo gravada)
+
+O problema era que não era testado o tamanho do nome da tabela ao ser criada. Para concertar bastou
+um testar o tamanho de t->objName em void createTable(rc_insert *t) do arquivo sqlcommands.c, não
+deixando criar a tabela se ultrapassar o tamanho máximo, mostrando um erro. 
 ---------------------------------------------------------------------------------------------------
 
 
