@@ -184,6 +184,7 @@ int TrocaArquivosObj(char *nomeTabela, char *linha){
     }
 
     if(objcmp(tabela, nomeTabela) == 0){
+		free(tabela);
         return 1;
     }
 

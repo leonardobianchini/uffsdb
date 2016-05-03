@@ -1,8 +1,81 @@
-Alunos: Leonardo Bianchini, João Becker e Marco Puton
+Alunos: Leonardo Bianchini, João Carlos Becker e Marco Aurélio Alves Puton
 
-----------------------------------------BUGS----------------------------------------
+----------------------------------------BUGS CORRIGIDOS----------------------------------------
+
+1) Falha de segmentação ao errar o nome da exclusão do banco de dados, 
+quando o mesmo não existe:
+
+uffsdb (15.1).
+Type "help" for help.
+
+You are now connected to database "uffsdb" as user "uffsdb".
+uffsdb=# \l
+ 					List of databases
+       Name  	    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges  
+--------------------+----------+----------+-------------+-------------+-----------------------
+uffsdb              | uffsdb  | UTF8     | pt_BR.UTF-8 | pt_BR.UTF-8 | 
+(1 row)
+
+
+
+uffsdb=# drop database ajsgdajghsdjahsdghgdahsdgajhsdghasgdhasgdhasdhjasdhjasgdhjagsdjgsdjahsgdjagd;
+*** Error in `./uffsdb': free(): invalid next size (fast): 0x00000000009343f0 ***
+Abortado
+
 
 ------------------------------------------------------------------------------------
+2) O nome do dono das tabelas está fixo, com o nome ibetres:
+
+perdi=# \d
+		List of Relations
+ Schema     | Name            | Type       | Owner     
+------------+-----------------+------------+-------
+ public     | ambulatorio     | tuple      | ibetres   
+ public     | medico          | tuple      | ibetres   
+ public     | paciente        | tuple      | ibetres   
+ public     | consulta        | tuple      | ibetres   
+ public     | funcionario     | tuple      | ibetres   
+ public     | salario         | tuple      | ibetres    
+(6 rows)
+
+------------------------------------------------------------------------------------
+3) Há alguns vazamentos de memória nos arquivos misc.c e sqlcommands.c.
+
+------------------------------------------------------------------------------------
+4) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
+tabelas, o nome não aparece completo, ao tentar excluir não foi possível e ao tentar 
+inserir valores ocorreu falha de segmentação.
+
+perdi=# create table perdi_mais_uma_vez_testando_quantidade (cod integer primary key, nome varchar(20));
+CREATE TABLE
+perdi=# \d
+		List of Relations
+ Schema     | Name            | Type       | Owner     
+------------+-----------------+------------+-------
+ public     | ambulatorio     | tuple      | ibetres   
+ public     | medico          | tuple      | ibetres   
+ public     | paciente        | tuple      | ibetres   
+ public     | consulta        | tuple      | ibetres   
+ public     | funcionario     | tuple      | ibetres   
+ public     | salario         | tuple      | ibetres   
+ public     | perdi_mais_uma_vez_t | tuple      | ibetres   
+(7 rows)
+
+perdi=# drop table perdi_mais_uma_vez_testando_quantidade;
+ERROR: table "perdi_mais_uma_vez_testando_quantidade" does not exist.
+perdi=# 
+
+perdi=# insert into perdi_mais_uma_vez_testando_quantidade values (12,'adad');       
+ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
+ERROR: INSERT has more expressions than target columns.
+Falha de segmentação (imagem do núcleo gravada)
+---------------------------------------------------------------------------------------------------
+
+
+
+
+----------------------------------------BUGS NÃO CORRIGIDOS----------------------------------------
+
 1) Não detecta erro ao tentar inserir uma string num char;
 
 perdi=# insert into salario values (2158750, 'Masculino', 2540.50);
@@ -95,58 +168,10 @@ RROR: syntax error.
 perdi=# 
 
 ------------------------------------------------------------------------------------
-[DONE] 9) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
-tabelas, o nome não aparece completo, ao tentar excluir não foi possível e ao tentar 
-inserir valores ocorreu falha de segmentação.
-
-perdi=# create table perdi_mais_uma_vez_testando_quantidade (cod integer primary key, nome varchar(20));
-CREATE TABLE
-perdi=# \d
-		List of Relations
- Schema     | Name            | Type       | Owner     
-------------+-----------------+------------+-------
- public     | ambulatorio     | tuple      | ibetres   
- public     | medico          | tuple      | ibetres   
- public     | paciente        | tuple      | ibetres   
- public     | consulta        | tuple      | ibetres   
- public     | funcionario     | tuple      | ibetres   
- public     | salario         | tuple      | ibetres   
- public     | perdi_mais_uma_vez_t | tuple      | ibetres   
-(7 rows)
-
-perdi=# drop table perdi_mais_uma_vez_testando_quantidade;
-ERROR: table "perdi_mais_uma_vez_testando_quantidade" does not exist.
-perdi=# 
-
-perdi=# insert into perdi_mais_uma_vez_testando_quantidade values (12,'adad');       
-ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
-ERROR: INSERT has more expressions than target columns.
-Falha de segmentação (imagem do núcleo gravada)
-
-------------------------------------------------------------------------------------
-10) Retorno de erro errado ao usar áspas duplas:
+9) Retorno de erro errado ao usar áspas duplas:
 
 uffsdb=# insert into funcionario values (1000000, "Oi", 21, "Trindade", 1234567890123456.11111);
 "Expected token "VALUES" after object name.
 ERROR: syntax error.
 
-------------------------------------------------------------------------------------
-[DONE] 11) Falha de segmentação ao errar o nome da exclusão do banco de dados, 
-quando o mesmo não existe:
 
-uffsdb (15.1).
-Type "help" for help.
-
-You are now connected to database "uffsdb" as user "uffsdb".
-uffsdb=# \l
- 					List of databases
-       Name  	    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges  
---------------------+----------+----------+-------------+-------------+-----------------------
-uffsdb              | uffsdb  | UTF8     | pt_BR.UTF-8 | pt_BR.UTF-8 | 
-(1 row)
-
-
-
-uffsdb=# drop database ajsgdajghsdjahsdghgdahsdgajhsdghasgdhasgdhasdhjasdhjasgdhjagsdjgsdjahsgdjagd;
-*** Error in `./uffsdb': free(): invalid next size (fast): 0x00000000009343f0 ***
-Abortado

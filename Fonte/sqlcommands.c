@@ -699,6 +699,7 @@ int procuraSchemaArquivo(struct fs_objects objeto){
 
     if((schema = fopen(directory, "a+b")) == NULL) {
         free(tupla);
+        free(esquema);
         return ERRO_REMOVER_ARQUIVO_SCHEMA;
     }
 
@@ -707,6 +708,7 @@ int procuraSchemaArquivo(struct fs_objects objeto){
 
     if((newSchema = fopen(directory, "a+b")) == NULL) {
         free(tupla);
+        free(esquema);
         return ERRO_REMOVER_ARQUIVO_SCHEMA;
     }
 
@@ -765,6 +767,7 @@ int procuraSchemaArquivo(struct fs_objects objeto){
     system(directoryex);
 
     free(tupla);
+    free(esquema);
     return SUCCESS;
 }
 
@@ -816,8 +819,10 @@ int excluirTabela(char *nomeTabela) {
     strcpy(directory, connected.db_directory);
     strcat(directory, "fs_object.dat");
 
-    if((dicionario = fopen(directory,"a+b")) == NULL)
+    if((dicionario = fopen(directory,"a+b")) == NULL){
+        free(tupla);
         return ERRO_ABRIR_ARQUIVO;
+	}
 
     k=0;
     while(fgetc (dicionario) != EOF){
@@ -846,6 +851,9 @@ int excluirTabela(char *nomeTabela) {
                         if(tab3[l].chave == FK) { //verifica se a outra tabela possui chave estrangeira. se sim, verifica se e da tabela anterior.
                             if(objcmp(nomeTabela, tab3[l].tabelaApt) == 0) {
                                 printf("ERROR: cannot drop table \"%s\" because other objects depend on it.\n", nomeTabela);
+                                free(tupla);
+                                free(tab3);
+                                free(tab2);
                                 return ERRO_CHAVE_ESTRANGEIRA;
                             }
                         }
@@ -857,7 +865,7 @@ int excluirTabela(char *nomeTabela) {
     }
 
     free(tab2);
-
+	free(tupla);
     tp_buffer *bufferpoll = initbuffer();
 
     if(bufferpoll == ERRO_DE_ALOCACAO){
