@@ -53,15 +53,14 @@ void notConnected() {
     printf("ERROR: you are not connected to any database.\n");
 }
 
-void setObjName(char **nome) {
+void setObjName(char **nome) {	
     if (GLOBAL_PARSER.mode != 0) {
         GLOBAL_DATA.objName = malloc(sizeof(char)*((strlen(*nome)+1)));
 
         strcpylower(GLOBAL_DATA.objName, *nome);
         GLOBAL_DATA.objName[strlen(*nome)] = '\0';
         GLOBAL_PARSER.step++;
-    } else
-        return;
+    } 
 }
 
 void setColumnInsert(char **nome) {
@@ -204,6 +203,10 @@ void setMode(char mode) {
     GLOBAL_PARSER.step++;
 }
 
+void testeWhere(){
+	printf("buceta\n");
+}
+
 
 int interface() {
     pthread_t pth;
@@ -236,7 +239,7 @@ int interface() {
                             else
                                 printf("WARNING: Nothing to be inserted. Command ignored.\n");
                             break;
-                        case OP_SELECT_ALL:
+                        case OP_SELECT:
                             imprime(GLOBAL_DATA.objName);
                             break;
                         case OP_CREATE_TABLE:
@@ -263,7 +266,7 @@ int interface() {
                 case OP_DROP_DATABASE:
                 case OP_CREATE_TABLE:
                 case OP_DROP_TABLE:
-                case OP_SELECT_ALL:
+                case OP_SELECT:
                 case OP_INSERT:
                     if (GLOBAL_PARSER.step == 1) {
                         GLOBAL_PARSER.consoleFlag = 0;

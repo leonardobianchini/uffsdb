@@ -588,7 +588,7 @@ void insert(rc_insert *s_insert) {
 
 ///////////////
 void imprime(char nomeTabela[]) {
-
+	printf("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
     int j,erro, x, p, cont=0;
     struct fs_objects objeto;
 

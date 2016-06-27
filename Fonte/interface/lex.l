@@ -35,6 +35,7 @@
 (?i:DATABASE)					return DATABASE;
 (?i:DROP)						return DROP;
 (?i:CONTRIBUTORS)               return CONTR;
+(?i:WHERE)						return WHERE;
 help							return HELP;
 [\\][h]							return HELP;
 [\\][h]+[^\n]*					{invalidCommand(yytext);};
@@ -46,7 +47,10 @@ help							return HELP;
 [*]								return *yytext;
 [(]								return *yytext;
 [)]								return *yytext;
+[.]								return *yytext;
 
+
+([>]|[<]|[>=]|[<=]|[=]|[!=])+	{yylval.strval = yytext; return RELATIONAL;};
 ([a-zA-Z_]+[0-9_]*)+			{yylval.strval = yytext; return OBJECT;};
 [\']([^'])+[\']			  		{yylval.strval = yytext; return ALPHANUM;};
 [0-9]*\.[0-9]*					{yylval.strval = yytext; return VALUE;};
