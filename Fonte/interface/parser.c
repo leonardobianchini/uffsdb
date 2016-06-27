@@ -69,8 +69,39 @@ void setColumnInsert(char **nome) {
     GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = malloc(sizeof(char)*(strlen(*nome)+1));
     strcpylower(GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count], *nome);
     GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count][strlen(*nome)] = '\0';
-
+	
+	printf("kajhsdklajdl: %s\n", *nome);
+	
     GLOBAL_PARSER.col_count++;
+}
+
+void oi(char **nome){
+	int i, flag=0, divisor;
+	char b[TAMANHO_NOME_TABELA], a[TAMANHO_NOME_CAMPO];
+	for(i=0;i<sizeof(*nome);i++){
+		if(nome[i]=='.'){
+			flag=1;
+			divisor=i;
+		}else{
+			if(flag){
+				a[i]=nome[i+divisor+1];
+				a[i+1]=0;
+			}else{
+				b[i]=nome[i];
+				b[i+1]=0;
+			}
+		}
+	}
+	printf("kajbkdjnad: %s\nbefore:%s\n\n\nafter:%s\n\n",*nome, b,a);
+	
+	//Antes do ponto
+	setObjName(b);
+	
+	//depois do ponto
+	setColumnInsert(a);
+	
+	
+	GLOBAL_DATA.N++;
 }
 
 void setValueInsert(char *nome, char type) {
@@ -240,7 +271,7 @@ int interface() {
                                 printf("WARNING: Nothing to be inserted. Command ignored.\n");
                             break;
                         case OP_SELECT:
-                            imprime(GLOBAL_DATA.objName);
+                            imprime(GLOBAL_DATA.objName, &GLOBAL_DATA);
                             break;
                         case OP_CREATE_TABLE:
                             createTable(&GLOBAL_DATA);

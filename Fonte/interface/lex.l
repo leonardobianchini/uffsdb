@@ -50,11 +50,12 @@ help							return HELP;
 [.]								return *yytext;
 
 
-([>]|[<]|[>=]|[<=]|[=]|[!=])+	{yylval.strval = yytext; return RELATIONAL;};
-([a-zA-Z_]+[0-9_]*)+			{yylval.strval = yytext; return OBJECT;};
-[\']([^'])+[\']			  		{yylval.strval = yytext; return ALPHANUM;};
-[0-9]*\.[0-9]*					{yylval.strval = yytext; return VALUE;};
-[0-9]+							{yylval.strval = yytext; return NUMBER;}
+([>]|[<]|[>=]|[<=]|[=]|[!=])+							{yylval.strval = yytext; return RELATIONAL;};
+([a-zA-Z_]+[0-9_]*)+									{yylval.strval = yytext; return OBJECT;};
+([a-zA-Z_]+[0-9_]*)+[.]([a-zA-Z_]+[0-9_]*)			{yylval.strval = yytext; return ATRIBUTE;};
+[\']([^'])+[\']			  								{yylval.strval = yytext; return ALPHANUM;};
+[0-9]*\.[0-9]*											{yylval.strval = yytext; return VALUE;};
+[0-9]+													{yylval.strval = yytext; return NUMBER;}
 
 \n								{
 									if (GLOBAL_PARSER.mode != 0) {

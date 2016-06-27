@@ -587,11 +587,25 @@ void insert(rc_insert *s_insert) {
 
 
 ///////////////
-void imprime(char nomeTabela[]) {
-	printf("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
+void imprime(char nomeTabela[], rc_insert *s_insert) {
     int j,erro, x, p, cont=0;
     struct fs_objects objeto;
-
+    
+    
+	table *tabela = (table *)malloc(sizeof(table));
+	tabela->esquema = NULL;
+	memset(tabela, 0, sizeof(table));
+	
+	abreTabela(s_insert->objName, &objeto, &tabela->esquema); //retorna o esquema para a insere valor
+	
+	printf("s_insert->N: %d\n", s_insert->N);
+	printf("nome: %s\n", s_insert->columnName[0]);
+	
+	
+	
+	
+	
+	
     if(!verificaNomeTabela(nomeTabela)){
         printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
         return;

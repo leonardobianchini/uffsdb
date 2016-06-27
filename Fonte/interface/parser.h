@@ -54,6 +54,9 @@ void connect(char *nome);
  */
 void setObjName(char **nome);
 
+
+void oi(char **nome);
+
 /* Adiciona na estrutura uma nova coluna identificada no
  * comando INSERT.
  */

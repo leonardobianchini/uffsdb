@@ -74,7 +74,8 @@ extern int yydebug;
     CLEAR = 284,
     CONTR = 285,
     WHERE = 286,
-    RELATIONAL = 287
+    RELATIONAL = 287,
+    ATRIBUTE = 288
   };
 #endif
 /* Tokens.  */
@@ -108,6 +109,7 @@ extern int yydebug;
 #define CONTR 285
 #define WHERE 286
 #define RELATIONAL 287
+#define ATRIBUTE 288
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -121,7 +123,7 @@ union YYSTYPE
     int subtok;
     char *strval;
 
-#line 125 "y.tab.h" /* yacc.c:1909  */
+#line 127 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
