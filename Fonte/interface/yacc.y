@@ -176,17 +176,21 @@ select: SELECT {setMode(OP_SELECT_ALL);} '*' FROM table_select where semicolon {
 
 table_select: OBJECT {setObjName(yytext);};
 
-where: WHERE expression;
+where:  
+	| WHERE expression;
 
-expression:	operand outro;
+expression:	paren;
 
 operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} 
 		| VALUE
 		| NUMBER;
 		
-outro:	/*Nothing*/
-	| ARITMETIC expression
-		
+
+paren: operand paren2 | '(' paren ')' paren2
+paren2: /* nothing */
+	| ARITMETIC paren
+
+
 
 /* END */
 %%
