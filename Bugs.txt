@@ -1,0 +1,186 @@
+Alunos: Leonardo Bianchini, João Carlos Becker e Marco Aurélio Alves Puton
+
+----------------------------------------BUGS CORRIGIDOS----------------------------------------
+
+11) Falha de segmentação ao errar o nome da exclusão do banco de dados, 
+quando o mesmo não existe:
+
+uffsdb (15.1).
+Type "help" for help.
+
+You are now connected to database "uffsdb" as user "uffsdb".
+uffsdb=# \l
+ 					List of databases
+       Name  	    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges  
+--------------------+----------+----------+-------------+-------------+-----------------------
+uffsdb              | uffsdb  | UTF8     | pt_BR.UTF-8 | pt_BR.UTF-8 | 
+(1 row)
+
+
+
+uffsdb=# drop database ajsgdajghsdjahsdghgdahsdgajhsdghasgdhasgdhasdhjasdhjasgdhjagsdjgsdjahsgdjagd;
+*** Error in `./uffsdb': free(): invalid next size (fast): 0x00000000009343f0 ***
+Abortado
+
+A comparação das strings na função int objcmp(char *obj, char *str) do arquivo misc.c
+não funcionava corretamente. Foi consertada testando caractere por caractere.
+
+------------------------------------------------------------------------------------
+12) O nome do dono das tabelas está fixo, com o nome ibetres:
+
+perdi=# \d
+		List of Relations
+ Schema     | Name            | Type       | Owner     
+------------+-----------------+------------+-------
+ public     | ambulatorio     | tuple      | ibetres   
+ public     | medico          | tuple      | ibetres   
+ public     | paciente        | tuple      | ibetres   
+ public     | consulta        | tuple      | ibetres   
+ public     | funcionario     | tuple      | ibetres   
+ public     | salario         | tuple      | ibetres    
+(6 rows)
+
+Bastou mudar o valor fixo por connected.db_name em void printTable(char *tbl) do arquivo dictionary.c.
+
+------------------------------------------------------------------------------------
+13) Há alguns vazamentos de memória nos arquivos misc.c e sqlcommands.c.
+Apenas foi adicionado free() antes de alguns returns.
+
+------------------------------------------------------------------------------------
+9) Banco recebeu a tabela com nome longo e criou com sucesso, mas quando lista as 
+tabelas, o nome não aparece completo, ao tentar excluir não foi possível e ao tentar 
+inserir valores ocorreu falha de segmentação.
+
+perdi=# create table perdi_mais_uma_vez_testando_quantidade (cod integer primary key, nome varchar(20));
+CREATE TABLE
+perdi=# \d
+		List of Relations
+ Schema     | Name            | Type       | Owner     
+------------+-----------------+------------+-------
+ public     | ambulatorio     | tuple      | ibetres   
+ public     | medico          | tuple      | ibetres   
+ public     | paciente        | tuple      | ibetres   
+ public     | consulta        | tuple      | ibetres   
+ public     | funcionario     | tuple      | ibetres   
+ public     | salario         | tuple      | ibetres   
+ public     | perdi_mais_uma_vez_t | tuple      | ibetres   
+(7 rows)
+
+perdi=# drop table perdi_mais_uma_vez_testando_quantidade;
+ERROR: table "perdi_mais_uma_vez_testando_quantidade" does not exist.
+perdi=# 
+
+perdi=# insert into perdi_mais_uma_vez_testando_quantidade values (12,'adad');       
+ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
+ERROR: INSERT has more expressions than target columns.
+Falha de segmentação (imagem do núcleo gravada)
+
+O problema era que não era testado o tamanho do nome da tabela ao ser criada. Para consertar bastou
+um testar o tamanho de t->objName em void createTable(rc_insert *t) do arquivo sqlcommands.c, não
+deixando criar a tabela se ultrapassar o tamanho máximo, mostrando um erro. 
+---------------------------------------------------------------------------------------------------
+
+
+
+
+----------------------------------------BUGS NÃO CORRIGIDOS----------------------------------------
+
+1) Não detecta erro ao tentar inserir uma string num char;
+
+perdi=# insert into salario values (2158750, 'Masculino', 2540.50);
+INSERT 0 1
+perdi=# select * from salario;
+ rg         | sexo       | salario    
+------------+------------+------------
+ 2158750    | M          | 2540.500000 
+
+(1 row)
+
+------------------------------------------------------------------------------------
+2) Falha de segmentação ao tentar inserir chave estrangeira invalida;
+
+perdi=# insert into salario values (2343543, 'Feminino', 1321432.332);
+ERROR: invalid reference to "funcionario.rg". The value "2343543" does not exist.
+Falha de segmentação (imagem do núcleo gravada)
+
+------------------------------------------------------------------------------------
+3) Banco abortado após tentar inserir um valor grande dentro de um double;
+
+perdi=# insert into salario values (2158770, 'M', 22222222222222222222222222222222222222222222222);
+*** stack smashing detected ***: ./uffsdb terminated
+Abortado (imagem do núcleo gravada)
+
+------------------------------------------------------------------------------------
+
+4) Após a inserção de numeros muito grandes, o banco encontrou problemas ao ler os 
+metadados; //Isso aconteceu após a tentativa de inserção do bug3, que abortou o 
+programa mas o banco recebeu a entrada.
+
+perdi=# select * from salario;
+ rg         | sexo       | salario    
+------------+------------+------------
+ 2158750    | M          | 2540.500000 
+ 2158770    | M          | 0.000000   
+ -256684800 |            | 0.000000   
+ -256622392 |            | -4771942904220153216856632813038296586784305435377709027699810847377593403892
+01944199885727032843562073804668878206904177524126469232639664332768821304373877969059887953032834449408.000000 
+ -257933113 |            | -141392453033400786938804840404349921638961583875418671161490850039427570009202527832002657935308
+775602391310488224880483516012450699399688282056326873050525941292435103413965978107589748338517817344621666786869248.000000 
+ 16547      |           | 0.000000   
+
+(6 rows)
+
+
+------------------------------------------------------------------------------------
+5) O nome do banco repete-se conforme o numero de ";" inseridos em seguida na linha 
+de comando;
+
+perdi=# ;;;;
+perdi=# perdi=# perdi=# perdi=# ;;;;;;;;;
+perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# perdi=# 
+
+------------------------------------------------------------------------------------
+6) Ao inserir apóstrofos na linha de comando, o banco não responde a nenhum comando 
+e fica nisso até que se insira outro apóstrofo.
+>>>>>>> 4891c9dea6159991653a935523efa91b9396b763
+
+perdi=# '''''''
+''''''
+linha
+teste
+bug
+select * from salario;
+\q
+nao sai do bug
+só inserindo outro apóstrfo
+;;
+;
+
+'
+ERROR: syntax error.
+
+------------------------------------------------------------------------------------
+7) Ao inserir caracteres invalidos, o sgbd repete esses caracteres e não identifica 
+erro algum, seguindo normalmente como se nada estivesse acontecendo.
+
+perdi=# ]]]]}}}}^[]^[]^[]^[]
+]]]]}}}}]]]]perdi=# !#!@!##!@
+!#!@!##!@perdi=# 
+perdi=#
+
+------------------------------------------------------------------------------------
+8) Ao clicar em uma seta(qualquer direção) e der enter, printa RROR onde deveria ser 
+ERROR;
+
+perdi=# ^[[B
+RROR: syntax error.
+perdi=# 
+
+------------------------------------------------------------------------------------
+10) Retorno de erro errado ao usar áspas duplas:
+
+uffsdb=# insert into funcionario values (1000000, "Oi", 21, "Trindade", 1234567890123456.11111);
+"Expected token "VALUES" after object name.
+ERROR: syntax error.
+
+
