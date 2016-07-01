@@ -49,7 +49,8 @@ int yywrap() {
         CHAR        PRIMARY     KEY         REFERENCES  DATABASE
         DROP        OBJECT      NUMBER      VALUE       QUIT
         LIST_TABLES LIST_TABLE  ALPHANUM    CONNECT     HELP
-        LIST_DBASES CLEAR       CONTR		WHERE		ARITMETIC;
+        LIST_DBASES CLEAR       CONTR		WHERE		ARITMETIC
+        RELATIONAL;
 
 start: insert | select | create_table | create_database | drop_table | drop_database
      | table_attr | list_tables | connection | exit_program | semicolon {GLOBAL_PARSER.consoleFlag = 1; return 0;}
@@ -177,7 +178,7 @@ select: SELECT {setMode(OP_SELECT_ALL);} '*' FROM table_select where semicolon {
 table_select: OBJECT {setObjName(yytext);};
 
 where:  
-	| WHERE expression;
+	| WHERE equation;
 
 expression:	paren;
 
@@ -189,6 +190,9 @@ operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;}
 paren: operand paren2 | '(' paren ')' paren2
 paren2: /* nothing */
 	| ARITMETIC paren
+
+equation: expression RELATIONAL expression
+
 
 
 

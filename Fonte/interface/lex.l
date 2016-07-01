@@ -55,6 +55,7 @@ help							return HELP;
 [0-9]*\.[0-9]*					{yylval.strval = yytext; return VALUE;};
 [0-9]+							{yylval.strval = yytext; return NUMBER;}
 ([%]|[/]|[-]|[+]|[*])			{yylval.strval = yytext; return ARITMETIC;}
+([>=]|[<=]|[=]|[!=]|[>]|[<])	{yylval.strval = yytext; return RELATIONAL;}
 
 \n								{
 									if (GLOBAL_PARSER.mode != 0) {
