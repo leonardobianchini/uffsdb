@@ -23,7 +23,7 @@ uffsdb=# drop database ajsgdajghsdjahsdghgdahsdgajhsdghasgdhasgdhasdhjasdhjasgdh
 Abortado
 
 A comparação das strings na função int objcmp(char *obj, char *str) do arquivo misc.c
-não funcionava corretamente. Foi consertada testando caractere por caractere.
+não funcionava corretamente. Foi concertada testando caractere por caractere.
 
 ------------------------------------------------------------------------------------
 12) O nome do dono das tabelas está fixo, com o nome ibetres:
@@ -75,7 +75,7 @@ ERROR: relation "perdi_mais_uma_vez_testando_quantidade" was not found.
 ERROR: INSERT has more expressions than target columns.
 Falha de segmentação (imagem do núcleo gravada)
 
-O problema era que não era testado o tamanho do nome da tabela ao ser criada. Para consertar bastou
+O problema era que não era testado o tamanho do nome da tabela ao ser criada. Para concertar bastou
 um testar o tamanho de t->objName em void createTable(rc_insert *t) do arquivo sqlcommands.c, não
 deixando criar a tabela se ultrapassar o tamanho máximo, mostrando um erro. 
 ---------------------------------------------------------------------------------------------------
