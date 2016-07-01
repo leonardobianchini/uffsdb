@@ -18,6 +18,7 @@
 %%
 
 (?i:INSERT)						return INSERT;
+(?i:WHERE)						return WHERE;
 (?i:INTO)						return INTO;
 (?i:VALUES)						return VALUES;
 (?i:SELECT)						return SELECT;
@@ -46,11 +47,14 @@ help							return HELP;
 [*]								return *yytext;
 [(]								return *yytext;
 [)]								return *yytext;
+[.]								return *yytext;
+
 
 ([a-zA-Z_]+[0-9_]*)+			{yylval.strval = yytext; return OBJECT;};
 [\']([^'])+[\']			  		{yylval.strval = yytext; return ALPHANUM;};
 [0-9]*\.[0-9]*					{yylval.strval = yytext; return VALUE;};
 [0-9]+							{yylval.strval = yytext; return NUMBER;}
+([%]|[/]|[-]|[+]|[*])			{yylval.strval = yytext; return ARITMETIC;}
 
 \n								{
 									if (GLOBAL_PARSER.mode != 0) {
