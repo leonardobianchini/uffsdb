@@ -72,7 +72,9 @@ extern int yydebug;
     HELP = 282,
     LIST_DBASES = 283,
     CLEAR = 284,
-    CONTR = 285
+    CONTR = 285,
+    WHERE = 286,
+    ARITMETIC = 287
   };
 #endif
 /* Tokens.  */
@@ -104,6 +106,8 @@ extern int yydebug;
 #define LIST_DBASES 283
 #define CLEAR 284
 #define CONTR 285
+#define WHERE 286
+#define ARITMETIC 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -117,7 +121,7 @@ union YYSTYPE
     int subtok;
     char *strval;
 
-#line 121 "y.tab.h" /* yacc.c:1909  */
+#line 125 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -178,12 +178,15 @@ table_select: OBJECT {setObjName(yytext);};
 
 where: WHERE expression;
 
-expression:	operand ARITMETIC operand;
+expression:	operand outro;
 
 operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} 
 		| VALUE
 		| NUMBER;
-
+		
+outro:	/*Nothing*/
+	| ARITMETIC expression
+		
 
 /* END */
 %%
