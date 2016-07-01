@@ -75,7 +75,10 @@ extern int yydebug;
     CONTR = 285,
     WHERE = 286,
     ARITMETIC = 287,
-    RELATIONAL = 288
+    RELATIONAL = 288,
+    LOGICAL = 289,
+    AND = 290,
+    OR = 291
   };
 #endif
 /* Tokens.  */
@@ -110,6 +113,9 @@ extern int yydebug;
 #define WHERE 286
 #define ARITMETIC 287
 #define RELATIONAL 288
+#define LOGICAL 289
+#define AND 290
+#define OR 291
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -123,7 +129,7 @@ union YYSTYPE
     int subtok;
     char *strval;
 
-#line 127 "y.tab.h" /* yacc.c:1909  */
+#line 133 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -19,6 +19,8 @@
 
 (?i:INSERT)						return INSERT;
 (?i:WHERE)						return WHERE;
+(?i:AND)						return AND;
+(?i:OR)							return OR;
 (?i:INTO)						return INTO;
 (?i:VALUES)						return VALUES;
 (?i:SELECT)						return SELECT;
@@ -50,12 +52,12 @@ help							return HELP;
 [.]								return *yytext;
 
 
-([a-zA-Z_]+[0-9_]*)+			{yylval.strval = yytext; return OBJECT;};
-[\']([^'])+[\']			  		{yylval.strval = yytext; return ALPHANUM;};
-[0-9]*\.[0-9]*					{yylval.strval = yytext; return VALUE;};
-[0-9]+							{yylval.strval = yytext; return NUMBER;}
-([%]|[/]|[-]|[+]|[*])			{yylval.strval = yytext; return ARITMETIC;}
-([>=]|[<=]|[=]|[!=]|[>]|[<])	{yylval.strval = yytext; return RELATIONAL;}
+([a-zA-Z_]+[0-9_]*)+				{yylval.strval = yytext; return OBJECT;};
+[\']([^'])+[\']			  			{yylval.strval = yytext; return ALPHANUM;};
+[0-9]*\.[0-9]*						{yylval.strval = yytext; return VALUE;};
+[0-9]+								{yylval.strval = yytext; return NUMBER;}
+([%]|[/]|[-]|[+]|[*])				{yylval.strval = yytext; return ARITMETIC;}
+([>][=]|[<][=]|[=]|[!][=]|[>]|[<])	{yylval.strval = yytext; return RELATIONAL;}
 
 \n								{
 									if (GLOBAL_PARSER.mode != 0) {
