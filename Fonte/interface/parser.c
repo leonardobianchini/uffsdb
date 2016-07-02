@@ -237,6 +237,7 @@ int interface() {
                                 printf("WARNING: Nothing to be inserted. Command ignored.\n");
                             break;
                         case OP_SELECT_ALL:
+                            pulpfic(&GLOBAL_DATA);
                             imprime(GLOBAL_DATA.objName);
                             break;
                         case OP_CREATE_TABLE:

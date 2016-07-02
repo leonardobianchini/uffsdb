@@ -173,6 +173,14 @@ create_database: CREATE DATABASE {setMode(OP_CREATE_DATABASE);} OBJECT {setObjNa
 /* DROP DATABASE */
 drop_database: DROP DATABASE {setMode(OP_DROP_DATABASE);} OBJECT {setObjName(yytext);} semicolon {return 0;};
 
+
+
+
+
+
+
+
+
 /* SELECT */
 select: SELECT {setMode(OP_SELECT_ALL);} pos_select FROM table_select where semicolon {return 0;};
 
@@ -183,28 +191,33 @@ pos_select2:    | ',' pos_select3
 pos_select3: OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
 
 
-
 where:  
-	| WHERE logical_oper;
+	| WHERE {GLOBAL_PARSER.step++;} logical_oper;
 
 
 operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} 
-		| VALUE
-		| NUMBER;
-		
+		| valor
+		| numero
+        
+numero: NUMBER {GLOBAL_PARSER.step++;}
+    |   '-' NUMBER {GLOBAL_PARSER.step++;}
+
+valor: VALUE {GLOBAL_PARSER.step++;}
+    | '-' VALUE {GLOBAL_PARSER.step++;}
 
 paren: operand paren2 | '(' paren ')' paren2
 paren2: /* nothing */
-	| ARITMETIC paren
+	| ARITMETIC {GLOBAL_PARSER.step++;} paren
+    | '-' paren
 
-equation: paren RELATIONAL paren
+equation: paren RELATIONAL {GLOBAL_PARSER.step++;} paren
 
 logical_oper: equation lo | '(' logical_oper ')' lo
 lo: /* nothing */
 	| logico logical_oper
 
-logico: AND
-	| OR
+logico: AND {GLOBAL_PARSER.step++;}
+	| OR {GLOBAL_PARSER.step++;}
 
 
 /* END */

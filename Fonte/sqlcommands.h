@@ -35,6 +35,11 @@ int finalizaInsert(char *, column *);
     Parametros: Nome da tabela (char).
     Retorno:    void.
    ---------------------------------------------------------------------------------------------*/
+/*
+Essa função é a receita do sucesso
+*/
+void pulpfic(rc_insert *);
+
 void imprime(char [] );
 /* ----------------------------------------------------------------------------------------------
     Objetivo:   Função para exclusão de tabelas.

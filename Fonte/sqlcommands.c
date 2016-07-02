@@ -587,6 +587,18 @@ void insert(rc_insert *s_insert) {
 
 
 ///////////////
+
+void pulpfic(rc_insert * mineiro){
+    printf("Aqui começa o sucesso\n");
+    
+    
+    printf ("Aqui termina o sucesso\n");
+}
+
+
+
+
+
 void imprime(char nomeTabela[]) {
 
     int j,erro, x, p, cont=0;
