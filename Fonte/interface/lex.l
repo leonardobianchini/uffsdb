@@ -46,10 +46,11 @@ help							return HELP;
 
 [,]								return *yytext;
 [;]								return *yytext;
-[*]								return *yytext;
+[#]								return *yytext;
 [(]								return *yytext;
 [)]								return *yytext;
 [.]								return *yytext;
+
 
 
 ([a-zA-Z_]+[0-9_]*)+				{yylval.strval = yytext; return OBJECT;};
