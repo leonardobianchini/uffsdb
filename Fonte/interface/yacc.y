@@ -179,26 +179,18 @@ select: SELECT {setMode(OP_SELECT_ALL);} '*' FROM table_select where semicolon {
 table_select: OBJECT {setObjName(yytext);};
 
 where:  
-	| WHERE logical_oper;
+	| WHERE paren;		
 
+paren: operand paren2 | '(' paren ')' paren2
+paren2: /* nothing */
+	| ARITMETIC paren | logico paren | RELATIONAL paren
+
+logico: AND
+	| OR
 
 operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} 
 		| VALUE
 		| NUMBER;
-		
-
-paren: operand paren2 | '(' paren ')' paren2
-paren2: /* nothing */
-	| ARITMETIC paren
-
-equation: paren RELATIONAL paren
-
-logical_oper: equation lo | '(' logical_oper ')' lo
-lo: /* nothing */
-	| logico logical_oper
-
-logico: AND
-	| OR
 
 
 /* END */
