@@ -186,7 +186,7 @@ select: SELECT {setMode(OP_SELECT_ALL);} pos_select FROM table_select where semi
 
 table_select: OBJECT {setObjName(yytext);};
 
-pos_select: '#' | OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
+pos_select: '*' | OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
 pos_select2:    | ',' pos_select3
 pos_select3: OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
 
@@ -209,6 +209,7 @@ paren: operand paren2 | '(' paren ')' paren2
 paren2: /* nothing */
 	| ARITMETIC {GLOBAL_PARSER.step++;} paren
     | '-' paren
+    | '*' paren
 
 equation: paren RELATIONAL {GLOBAL_PARSER.step++;} paren
 
