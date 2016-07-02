@@ -174,9 +174,15 @@ create_database: CREATE DATABASE {setMode(OP_CREATE_DATABASE);} OBJECT {setObjNa
 drop_database: DROP DATABASE {setMode(OP_DROP_DATABASE);} OBJECT {setObjName(yytext);} semicolon {return 0;};
 
 /* SELECT */
-select: SELECT {setMode(OP_SELECT_ALL);} '#' FROM table_select where semicolon {return 0;};
+select: SELECT {setMode(OP_SELECT_ALL);} pos_select FROM table_select where semicolon {return 0;};
 
 table_select: OBJECT {setObjName(yytext);};
+
+pos_select: '#' | OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
+pos_select2:    | ',' pos_select3
+pos_select3: OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
+
+
 
 where:  
 	| WHERE logical_oper;

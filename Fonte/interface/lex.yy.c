@@ -1116,39 +1116,39 @@ return *yytext;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 56 "lex.l"
+#line 55 "lex.l"
 {yylval.strval = yytext; return OBJECT;};
 	YY_BREAK
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 57 "lex.l"
+#line 56 "lex.l"
 {yylval.strval = yytext; return ALPHANUM;};
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 58 "lex.l"
+#line 57 "lex.l"
 {yylval.strval = yytext; return VALUE;};
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 59 "lex.l"
+#line 58 "lex.l"
 {yylval.strval = yytext; return NUMBER;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 60 "lex.l"
+#line 59 "lex.l"
 {yylval.strval = yytext; return ARITMETIC;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 61 "lex.l"
+#line 60 "lex.l"
 {yylval.strval = yytext; return RELATIONAL;}
 	YY_BREAK
 case 39:
 /* rule 39 can match eol */
 YY_RULE_SETUP
-#line 63 "lex.l"
+#line 62 "lex.l"
 {
 									if (GLOBAL_PARSER.mode != 0) {
 										if (GLOBAL_PARSER.parentesis)
@@ -1166,74 +1166,74 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 78 "lex.l"
+#line 77 "lex.l"
 return CONNECT;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 79 "lex.l"
+#line 78 "lex.l"
 {invalidCommand(yytext);};
 	YY_BREAK
 case 42:
 /* rule 42 can match eol */
 YY_RULE_SETUP
-#line 80 "lex.l"
+#line 79 "lex.l"
 {invalidCommand("\\c <enter>'. Expecting '\\c DBNAME"); return 0;};
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 81 "lex.l"
+#line 80 "lex.l"
 return LIST_DBASES;
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 82 "lex.l"
+#line 81 "lex.l"
 {invalidCommand(yytext);};
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 83 "lex.l"
+#line 82 "lex.l"
 return QUIT;
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 84 "lex.l"
+#line 83 "lex.l"
 {invalidCommand(yytext);};
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 85 "lex.l"
+#line 84 "lex.l"
 return LIST_TABLES;
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 86 "lex.l"
+#line 85 "lex.l"
 {invalidCommand(yytext);};
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 87 "lex.l"
+#line 86 "lex.l"
 return LIST_TABLE;
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 88 "lex.l"
+#line 87 "lex.l"
 {invalidCommand(yytext);};
 	YY_BREAK
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 89 "lex.l"
+#line 88 "lex.l"
 {invalidCommand("\\t <enter>'. Expecting '\\t TABLENAME"); return 0;};
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 90 "lex.l"
+#line 89 "lex.l"
 /* ignore whitespace */;
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 91 "lex.l"
+#line 90 "lex.l"
 ECHO;
 	YY_BREAK
 #line 1240 "lex.yy.c"
@@ -2194,7 +2194,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 90 "lex.l"
+#line 89 "lex.l"
 
 
 
