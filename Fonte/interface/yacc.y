@@ -42,7 +42,6 @@ int yywrap() {
     char *strval;
 }
 
-%%
 
 %token  INSERT      INTO        VALUES      SELECT      FROM
         CREATE      TABLE       INTEGER     VARCHAR     DOUBLE
@@ -51,6 +50,8 @@ int yywrap() {
         LIST_TABLES LIST_TABLE  ALPHANUM    CONNECT     HELP
         LIST_DBASES CLEAR       CONTR		WHERE		ARITMETIC
         RELATIONAL	LOGICAL		AND			OR;
+
+%%
 
 start: insert | select | create_table | create_database | drop_table | drop_database
      | table_attr | list_tables | connection | exit_program | semicolon {GLOBAL_PARSER.consoleFlag = 1; return 0;}
@@ -180,7 +181,6 @@ table_select: OBJECT {setObjName(yytext);};
 where:  
 	| WHERE logical_oper;
 
-expression:	paren;
 
 operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} 
 		| VALUE
@@ -191,9 +191,9 @@ paren: operand paren2 | '(' paren ')' paren2
 paren2: /* nothing */
 	| ARITMETIC paren
 
-equation: expression RELATIONAL expression
+equation: paren RELATIONAL paren
 
-logical_oper: equation lo
+logical_oper: equation lo | '(' logical_oper ')' lo
 lo: /* nothing */
 	| logico logical_oper
 
