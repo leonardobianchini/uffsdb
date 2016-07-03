@@ -36,6 +36,10 @@ rc_parser GLOBAL_PARSER;
 column *select_attributes = NULL;
 column *select_attribute = NULL;
 
+void null_list(){
+	select_attributes = NULL;
+}
+
 void start_list(){
 	select_attributes = (column *)malloc(sizeof(column));
 	select_attribute = (column *)malloc(sizeof(column));

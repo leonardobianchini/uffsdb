@@ -49,7 +49,7 @@ int yywrap() {
         DROP        OBJECT      NUMBER      VALUE       QUIT
         LIST_TABLES LIST_TABLE  ALPHANUM    CONNECT     HELP
         LIST_DBASES CLEAR       CONTR		WHERE		ARITMETIC
-        RELATIONAL	LOGICAL		AND			OR;
+        RELATIONAL	LOGICAL		AND			OR			STRING_LITERAL;
 
 %%
 
@@ -182,7 +182,7 @@ drop_database: DROP DATABASE {setMode(OP_DROP_DATABASE);} OBJECT {setObjName(yyt
 
 
 /* SELECT */
-select: SELECT {setMode(OP_SELECT_ALL);} pos_select FROM table_select where semicolon {return 0;};
+select: SELECT {setMode(OP_SELECT_ALL); null_list();} pos_select FROM table_select where semicolon {return 0;};
 
 table_select: OBJECT {setObjName(yytext);};
 
@@ -198,6 +198,7 @@ where:
 operand:	OBJECT {GLOBAL_PARSER.step++; } '.' OBJECT {GLOBAL_PARSER.step++;} 
 		| valor
 		| numero
+		| STRING_LITERAL
         
 sinal: '+' | '-'    
     

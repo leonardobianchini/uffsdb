@@ -58,8 +58,12 @@ help							return HELP;
 [\']([^'])+[\']			  			{yylval.strval = yytext; return ALPHANUM;};
 [0-9]+\.[0-9]+						{yylval.strval = yytext; return VALUE;};
 [0-9]+								{yylval.strval = yytext; return NUMBER;}
-([%]|[/])				{yylval.strval = yytext; return ARITMETIC;}
+([%]|[/])							{yylval.strval = yytext; return ARITMETIC;}
 ([>][=]|[<][=]|[=]|[!][=]|[>]|[<])	{yylval.strval = yytext; return RELATIONAL;}
+
+L?\"(\\.|[^\\"])*\"					{return(STRING_LITERAL); }
+
+
 
 \n								{
 									if (GLOBAL_PARSER.mode != 0) {

@@ -111,3 +111,5 @@ void start_list();
 void clear_list();
 
 void getAttr(int op, char **nome);
+
+void null_list();

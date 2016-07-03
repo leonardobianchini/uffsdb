@@ -32,6 +32,7 @@
 #define LOGICAL 288
 #define AND 289
 #define OR 290
+#define STRING_LITERAL 291
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
