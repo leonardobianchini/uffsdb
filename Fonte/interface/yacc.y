@@ -199,16 +199,18 @@ operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;}
 		| valor
 		| numero
         
+sinal: '+' | '-'    
+    
 numero: NUMBER {GLOBAL_PARSER.step++;}
-    |   '-' NUMBER {GLOBAL_PARSER.step++;}
+    |   sinal NUMBER {GLOBAL_PARSER.step++;}
 
 valor: VALUE {GLOBAL_PARSER.step++;}
-    | '-' VALUE {GLOBAL_PARSER.step++;}
+    | sinal VALUE {GLOBAL_PARSER.step++;}
 
 paren: operand paren2 | '(' paren ')' paren2
 paren2: /* nothing */
 	| ARITMETIC {GLOBAL_PARSER.step++;} paren
-    | '-' paren
+    | sinal paren
     | '*' paren
 
 equation: paren RELATIONAL {GLOBAL_PARSER.step++;} paren
