@@ -17,12 +17,20 @@ typedef struct tp_table{ // Estrutura usada para carregar fs_schema.dat
     struct tp_table *next;          // Encadeamento para o próximo campo.
 }tp_table;
 
-typedef struct column{ // Estrutura utilizada para inserir em uma tabela, excluir uma tupla e retornar valores de uma página.
+
+
+
+typedef struct column{ 				// Estrutura utilizada para inserir em uma tabela, excluir uma tupla e retornar valores de uma página.
     char tipoCampo;                     // Tipo do Campo.
-    char nomeCampo[TAMANHO_NOME_CAMPO]; //Nome do Campo.
+    char nomeCampo[TAMANHO_NOME_CAMPO]; // Nome do Campo.
     char *valorCampo;                   // Valor do Campo.
+    int  n;								// Quantidade se campos inseridos.
+    char nome[TAMANHO_NOME_TABELA]; // Nome da tabela.
     struct column *next;                // Encadeamento para o próximo campo.
 }column;
+
+
+
 
 typedef struct table{ // Estrutura utilizada para criar uma tabela.
     char nome[TAMANHO_NOME_TABELA]; // Nome da tabela.

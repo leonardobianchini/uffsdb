@@ -103,3 +103,11 @@ void clearGlobalStructs();
  * dos tokens iniciais.
  */
 void setMode(char mode);
+
+void push_list();
+
+void start_list();
+
+void clear_list();
+
+void getAttr(int op, char **nome);

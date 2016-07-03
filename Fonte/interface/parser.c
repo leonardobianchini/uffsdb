@@ -30,6 +30,78 @@ rc_insert GLOBAL_DATA;
  */
 rc_parser GLOBAL_PARSER;
 
+
+
+
+column *select_attributes = NULL;
+column *select_attribute = NULL;
+
+void start_list(){
+	select_attributes = (column *)malloc(sizeof(column));
+	select_attribute = (column *)malloc(sizeof(column));
+	
+	select_attributes->next = NULL;
+	select_attributes->n = 0;
+	
+	select_attribute->next = NULL;
+	select_attribute->n = 0;
+}
+
+void push_list(){
+	column *p;
+	
+	if(select_attributes->n == 0){
+		select_attributes = select_attribute;
+		select_attributes->n++;
+	}
+	else if(select_attributes->n > 0){
+		for(p = select_attributes; p != NULL; p = p->next){
+			if(p->next == NULL){
+				p->next = select_attribute;
+				select_attribute->next = NULL;
+				select_attributes->n++;
+			}
+		}
+	}
+}
+
+void clear_list(){
+	column *p;
+	column *q;
+	for(p = select_attributes; p != NULL;){
+		q = p->next;
+		free(p);
+		p = q;
+	}
+	start_list();
+}
+
+void getAttr(int op, char **nome){
+	if(op == -1){
+		//	Faz nada
+	}
+	else if(op == 0){
+		//select_attribute->nome = *nome;
+		strcpy(select_attribute->nome, *nome);
+	}
+	else if(op == 1){
+		//select_attribute->nomeCampo = *nome;
+		strcpy(select_attribute->nomeCampo, *nome);
+		push_list();
+		
+		select_attribute = (column *)malloc(sizeof(column));
+		select_attribute->next = NULL;
+		select_attribute->n = 0;
+	}
+	else{
+		printf("ERRO: PASSADO OPCAO INVALIDA NA FUNCAO getattr()");
+	}
+}
+
+
+
+
+
 void connect(char *nome) {
     int r;
     r = connectDB(nome);
@@ -237,7 +309,7 @@ int interface() {
                                 printf("WARNING: Nothing to be inserted. Command ignored.\n");
                             break;
                         case OP_SELECT_ALL:
-                            pulpfic(&GLOBAL_DATA);
+                            pulpfic(select_attributes);
                             imprime(GLOBAL_DATA.objName);
                             break;
                         case OP_CREATE_TABLE:

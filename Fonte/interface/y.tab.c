@@ -868,21 +868,25 @@ case 71:
 #line 187 "yacc.y"
 	{setObjName(yytext);}
 break;
+case 72:
+#line 189 "yacc.y"
+	{getAttr(-1, yytext);}
+break;
 case 73:
 #line 189 "yacc.y"
-	{GLOBAL_PARSER.step++;}
+	{clear_list(); GLOBAL_PARSER.step++; getAttr(0, yytext);}
 break;
 case 74:
 #line 189 "yacc.y"
-	{GLOBAL_PARSER.step++;}
+	{GLOBAL_PARSER.step++; getAttr(1, yytext);}
 break;
 case 78:
 #line 191 "yacc.y"
-	{GLOBAL_PARSER.step++;}
+	{GLOBAL_PARSER.step++; getAttr(0, yytext);}
 break;
 case 79:
 #line 191 "yacc.y"
-	{GLOBAL_PARSER.step++;}
+	{GLOBAL_PARSER.step++; getAttr(1, yytext);}
 break;
 case 82:
 #line 195 "yacc.y"
@@ -890,7 +894,7 @@ case 82:
 break;
 case 84:
 #line 198 "yacc.y"
-	{GLOBAL_PARSER.step++;}
+	{GLOBAL_PARSER.step++; }
 break;
 case 85:
 #line 198 "yacc.y"
@@ -928,7 +932,7 @@ case 108:
 #line 223 "yacc.y"
 	{GLOBAL_PARSER.step++;}
 break;
-#line 932 "y.tab.c"
+#line 936 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;

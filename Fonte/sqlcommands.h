@@ -38,7 +38,7 @@ int finalizaInsert(char *, column *);
 /*
 Essa função é a receita do sucesso
 */
-void pulpfic(rc_insert *);
+void pulpfic(column *);
 
 void imprime(char [] );
 /* ----------------------------------------------------------------------------------------------

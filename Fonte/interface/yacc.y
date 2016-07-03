@@ -186,16 +186,16 @@ select: SELECT {setMode(OP_SELECT_ALL);} pos_select FROM table_select where semi
 
 table_select: OBJECT {setObjName(yytext);};
 
-pos_select: '*' | OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
+pos_select: '*' {getAttr(-1, yytext);} | OBJECT {clear_list(); GLOBAL_PARSER.step++; getAttr(0, yytext);} '.' OBJECT {GLOBAL_PARSER.step++; getAttr(1, yytext);} pos_select2
 pos_select2:    | ',' pos_select3
-pos_select3: OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} pos_select2
+pos_select3: OBJECT {GLOBAL_PARSER.step++; getAttr(0, yytext);} '.' OBJECT {GLOBAL_PARSER.step++; getAttr(1, yytext);} pos_select2
 
 
 where:  
 	| WHERE {GLOBAL_PARSER.step++;} logical_oper;
 
 
-operand:	OBJECT {GLOBAL_PARSER.step++;} '.' OBJECT {GLOBAL_PARSER.step++;} 
+operand:	OBJECT {GLOBAL_PARSER.step++; } '.' OBJECT {GLOBAL_PARSER.step++;} 
 		| valor
 		| numero
         

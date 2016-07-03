@@ -588,10 +588,21 @@ void insert(rc_insert *s_insert) {
 
 ///////////////
 
-void pulpfic(rc_insert * mineiro){
+void pulpfic(column * mineiro){
     printf("Aqui começa o sucesso\n");
     
     
+    column *p;
+    
+    if(mineiro != NULL){
+		for(p = mineiro; p != NULL; p = p->next){
+			printf("Atributo: %s.%s\n", p->nome, p->nomeCampo);
+		}
+	}
+	else{
+		printf("*\n");
+	}
+	
     printf ("Aqui termina o sucesso\n");
 }
 
