@@ -38,7 +38,7 @@ int finalizaInsert(char *, column *);
 /*
 Essa função é a receita do sucesso
 */
-void pulpfic(column *);
+void pulpfic(column *, char []);
 
 void imprime(char [] );
 /* ----------------------------------------------------------------------------------------------
@@ -100,3 +100,11 @@ void createTable(rc_insert *);
 int verifyFieldName(char **, int );
 ////
 int verifyFK(char *, char *);
+
+void imprime2(char nomeTabela[], column * l);
+
+column * select_list(column * pages, column * attr, int num);
+
+int inList(column *a, column *b);
+
+column * list_like_page(column * lista);

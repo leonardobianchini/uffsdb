@@ -64,6 +64,7 @@ void push_list(){
 				p->next = select_attribute;
 				select_attribute->next = NULL;
 				select_attributes->n++;
+				break;
 			}
 		}
 	}
@@ -313,8 +314,7 @@ int interface() {
                                 printf("WARNING: Nothing to be inserted. Command ignored.\n");
                             break;
                         case OP_SELECT_ALL:
-                            pulpfic(select_attributes);
-                            imprime(GLOBAL_DATA.objName);
+                            pulpfic(select_attributes, GLOBAL_DATA.objName);
                             break;
                         case OP_CREATE_TABLE:
                             createTable(&GLOBAL_DATA);

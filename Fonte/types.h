@@ -24,8 +24,8 @@ typedef struct column{ 				// Estrutura utilizada para inserir em uma tabela, ex
     char tipoCampo;                     // Tipo do Campo.
     char nomeCampo[TAMANHO_NOME_CAMPO]; // Nome do Campo.
     char *valorCampo;                   // Valor do Campo.
-    int  n;								// Quantidade se campos inseridos.
-    char nome[TAMANHO_NOME_TABELA]; // Nome da tabela.
+    int  n;								// Quantidade de campos inseridos.
+    char nome[TAMANHO_NOME_TABELA]; 	// Nome da tabela.
     struct column *next;                // Encadeamento para o próximo campo.
 }column;
 

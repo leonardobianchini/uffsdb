@@ -588,26 +588,185 @@ void insert(rc_insert *s_insert) {
 
 ///////////////
 
-void pulpfic(column * mineiro){
-    printf("Aqui começa o sucesso\n");
-    
-    
-    column *p;
-    
-    if(mineiro != NULL){
-		for(p = mineiro; p != NULL; p = p->next){
-			printf("Atributo: %s.%s\n", p->nome, p->nomeCampo);
+
+//	Testa se a está em b. Não exatamente isso, mas nesse sentido
+int inList(column *a, column *b){
+	column *p;
+	
+	for(p = b; p != NULL; p = p->next){
+		if(strcmp(a->nomeCampo, p->nomeCampo) == 0){
+			return 1;
 		}
 	}
-	else{
-		printf("*\n");
-	}
-	
-    printf ("Aqui termina o sucesso\n");
+	return 0;
 }
 
 
+column * select_list(column * pages, column * attr, int num){
+	int i;
+	column * p = pages;
+	column * q;
+	column * novo;
+	
+	column * newList;
+	newList = (column *)malloc(sizeof(column));
+	newList->n = 0;
+	newList->next = NULL;
+	
+	if(pages == NULL)
+		return NULL;
+	
+	
+	for(i = 0; i < num; i++){
+		if(inList(&p[i], attr)){
+			novo = (column *)malloc(sizeof(column));
+			novo->tipoCampo = p[i].tipoCampo;
+			strcpy(novo->nomeCampo, p[i].nomeCampo);
+			novo->valorCampo = malloc(strlen(p[i].valorCampo)+1);
+			strcpy(novo->valorCampo, p[i].valorCampo);
+			strcpy(novo->nome, p[i].nome);
+			novo->next = NULL;
+			novo->n = 0;
+			
+			if(newList->n == 0){
+				newList = novo;
+				novo = NULL;
+				newList->n = 1;;
+			}
+			else{				
+				for(q = newList; q != NULL; q = q->next){
+					if(q->next == NULL){
+						q->next = novo;
+						break;
+					}
+				}
+				novo = NULL;
+				newList->n++;
+			}
+		}
+	}
+	return newList;
+}
 
+column * list_like_page(column * lista){
+	int i = 0;
+	column * p;
+	column * page;
+	page = (column *)malloc(sizeof(column) * lista->n);
+	
+	for(p = lista; p != NULL; p = p->next){
+		page[i].tipoCampo = p->tipoCampo;
+		strcpy(page[i].nomeCampo, p->nomeCampo);
+		page[i].valorCampo = malloc(strlen(p->valorCampo) + 1);
+		strcpy(page[i].valorCampo, p->valorCampo);
+		page[i].n = p->n;
+		strcpy(page[i].nome, p->nome);
+		page[i].next = p->next;
+		
+		i++;
+	}
+	free(p);
+	return page;
+}
+
+void imprime2(char nomeTabela[], column * l) {
+	
+    int j,erro, x, p, cont=0;
+    struct fs_objects objeto;
+	
+    if(!verificaNomeTabela(nomeTabela)){
+        printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
+        return;
+    }
+
+    objeto = leObjeto(nomeTabela);
+
+    tp_table *esquema = leSchema(objeto);
+
+    if(esquema == ERRO_ABRIR_ESQUEMA){
+        printf("ERROR: schema cannot be created.\n");
+        free(esquema);
+        return;
+    }
+
+    tp_buffer *bufferpoll = initbuffer();
+
+    if(bufferpoll == ERRO_DE_ALOCACAO){
+        free(bufferpoll);
+        free(esquema);
+        printf("ERROR: no memory available to allocate buffer.\n");
+        return;
+    }
+
+    erro = SUCCESS;
+    for(x = 0; erro == SUCCESS; x++)
+        erro = colocaTuplaBuffer(bufferpoll, x, esquema, objeto);
+
+    int ntuples = --x;
+	p = 0;
+	while(x){
+	    column *pagina = getPage(bufferpoll, esquema, objeto, p);
+	    if(pagina == ERRO_PARAMETRO){
+            printf("ERROR: could not open the table.\n");
+            free(bufferpoll);
+            free(esquema);
+            return;
+	    }
+
+
+		
+		// Provavelmente é aqui que tem que mudar a lista pagina		
+		
+		column * selected;
+		selected =  select_list(pagina, l, objeto.qtdCampos*bufferpoll[p].nrec);
+		pagina = list_like_page(selected);
+		//
+		
+		
+		// select oi.a from oi;
+
+	    if(!cont) {
+	        for(j = 0; j < l->n; j++){
+	            if(pagina[j].tipoCampo == 'S')
+	                printf(" %-20s ", pagina[j].nomeCampo);
+	        	else
+	                printf(" %-10s ", pagina[j].nomeCampo);
+	            if(j < l->n - 1)
+	            	printf("|");
+	        }
+	        printf("\n");
+	        for(j = 0; j < l->n; j++){
+	            printf("%s",(pagina[j].tipoCampo == 'S')? "----------------------": "------------");
+	            if(j < l->n - 1)
+	            	printf("+");
+	        }
+	        printf("\n");
+	    }
+	    cont++;
+		for(j = 0; j < selected->n; j++){
+        	if(pagina[j].tipoCampo == 'S')
+            	printf(" %-20s ", pagina[j].valorCampo);
+        	else if(pagina[j].tipoCampo == 'I'){
+            	printf(" %-10d ", pagina[j].valorCampo[0]);
+        	} else if(pagina[j].tipoCampo == 'C'){
+            	printf(" %-10c ", pagina[j].valorCampo[0]);
+        	} else if(pagina[j].tipoCampo == 'D'){
+            	double *n = (double *)&pagina[j].valorCampo[0];
+    	        printf(" %-10f ", *n);
+        	}
+        	
+            if((j+1) % l->n == 0)
+            	printf("\n");
+        	else
+        		printf("|");
+    	}
+    	x -= bufferpoll[p++].nrec;
+    }
+    printf("\n(%d %s)\n\n",ntuples,(1>=ntuples)?"row": "rows");
+
+    free(bufferpoll);
+    free(esquema);
+}
 
 
 void imprime(char nomeTabela[]) {
@@ -653,7 +812,10 @@ void imprime(char nomeTabela[]) {
             free(esquema);
             return;
 	    }
-
+		
+		// Provavelmente é aqui que tem que mudar a lista pagina
+		
+		
 	    if(!cont) {
 	        for(j=0; j < objeto.qtdCampos; j++){
 	            if(pagina[j].tipoCampo == 'S')
@@ -696,6 +858,24 @@ void imprime(char nomeTabela[]) {
     free(bufferpoll);
     free(esquema);
 }
+
+
+void pulpfic(column * mineiro, char nomeTabela[]){   
+    if(mineiro != NULL){
+		printf("atributos\n");
+		imprime2(nomeTabela, mineiro);
+	}
+	else{
+		printf("asterisco\n");
+		imprime(nomeTabela);
+	}
+}
+
+
+
+
+
+
 /* ----------------------------------------------------------------------------------------------
     Objetivo:   Copia todas as informações menos a tabela do objeto, que será removida.
     Parametros: Objeto que será removido do schema.

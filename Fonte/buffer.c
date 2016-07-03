@@ -65,7 +65,7 @@ column * getPage(tp_buffer *buffer, tp_table *campos, struct fs_objects objeto, 
         return ERRO_PARAMETRO;
 
     column *colunas = (column *)malloc(sizeof(column)*objeto.qtdCampos*(buffer[page].nrec)); //Aloca a quantidade de campos necessária
-
+													//objeto.qtdCampos*bufferpoll[p].nrec
     if(!colunas)
         return ERRO_DE_ALOCACAO;
 
