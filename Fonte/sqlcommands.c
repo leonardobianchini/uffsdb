@@ -638,17 +638,6 @@ column * select_list(column * pages, column * attr, int num){
 			novo->n = 0;
 
 
-/*
-            if(p[i].tipoCampo == 'I'){
-                printf("p[i] Int: %d\n", *(int *)p[i].valorCampo);
-                printf("tam int %ld   tam p int %ld\n",sizeof(int), sizeof(p[i].tipoCampo));
-            }
-            if(novo->tipoCampo == 'I'){
-                printf("novo Int: %d\n", *(int *)novo->valorCampo);
-                printf("tam int %ld   tam novo int %ld\n",sizeof(int), sizeof(novo->tipoCampo));
-            }
-*/
-
 			if(newList->n == 0){
 				newList = novo;
 				novo = NULL;
@@ -740,34 +729,46 @@ void imprime2(char nomeTabela[], column * l) {
 		selected =  select_list(pagina, l, objeto.qtdCampos*bufferpoll[p].nrec);
 
         column * cat;
+        int pdpano = 0;
 	    if(!cont) {
-	        for(cat = l ; cat; cat = cat->next){
+	        for(cat = selected ; cat; cat = cat->next){
 	            if(cat->tipoCampo == 'S')
 	                printf(" %-20s ", cat->nomeCampo);
 	        	else
 	                printf(" %-10s ", cat->nomeCampo);
-	            if(cat->next)
+	            if(pdpano+1 != l->n)
 	            	printf("|");
+	            
+	            pdpano++;
+				if(pdpano == l->n)
+					break;
 	        }
 	        printf("\n");
-	        for(cat = l ; cat; cat = cat->next){
+	        pdpano = 0;
+	        for(cat = selected ; cat; cat = cat->next){
 	            printf("%s",(cat->tipoCampo == 'S')? "----------------------": "------------");
-	            if(cat->next)
+	            if(pdpano+1 != l->n)
 	            	printf("+");
+	            
+	            pdpano++;
+				if(pdpano == l->n)
+					break;
 	        }
 	        printf("\n");
 	    }
 	    cont++;
         j=0;
-		for(cat=selected;cat; cat =  cat->next){
+		for(cat = selected; cat; cat = cat->next){
         	if(cat->tipoCampo == 'S')
             	printf(" %-20s ", cat->valorCampo);
         	else if(cat->tipoCampo == 'I'){
-            int *n = (int *)&cat->valorCampo[0];
-            printf(" %-10d ", *n);
-        } else if(cat->tipoCampo == 'C'){
+				int *n = (int *)&cat->valorCampo[0];
+				printf(" %-10d ", *n);
+			}
+			else if(cat->tipoCampo == 'C'){
             	printf(" %-10c ", cat->valorCampo[0]);
-        	} else if(cat->tipoCampo == 'D'){
+        	}
+        	else if(cat->tipoCampo == 'D'){
             	double *n = (double *)&cat->valorCampo[0];
     	        printf(" %-10f ", *n);
         	}
@@ -778,24 +779,22 @@ void imprime2(char nomeTabela[], column * l) {
         		printf("|");
             j++;
     	}
-      free(pagina);
-    	x -= bufferpoll[p++].nrec;
-      column * q;
-      column * a;
-      for(q = selected; q;){
-          a = q->next;
-          free(q->valorCampo);
-          free(q);
-          q = a;
-      }
-
-
+    	
+		free(pagina);
+		x -= bufferpoll[p++].nrec;
+		column * q;
+		column * a;
+		for(q = selected; q;){
+			a = q->next;
+			free(q->valorCampo);
+			free(q);
+			q = a;
+		}	
     }
     printf("\n(%d %s)\n\n",ntuples,(1>=ntuples)?"row": "rows");
 
     free(bufferpoll);
     free(esquema);
-
 }
 
 
@@ -842,9 +841,6 @@ void imprime(char nomeTabela[]) {
             free(esquema);
             return;
 	    }
-
-		// Provavelmente é aqui que tem que mudar a lista pagina
-
 
 	    if(!cont) {
 	        for(j=0; j < objeto.qtdCampos; j++){
