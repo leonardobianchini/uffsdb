@@ -738,7 +738,7 @@ void imprime2(char nomeTabela[], column * l) {
 	                printf(" %-10s ", cat->nomeCampo);
 	            if(pdpano+1 != l->n)
 	            	printf("|");
-	            
+
 	            pdpano++;
 				if(pdpano == l->n)
 					break;
@@ -749,7 +749,7 @@ void imprime2(char nomeTabela[], column * l) {
 	            printf("%s",(cat->tipoCampo == 'S')? "----------------------": "------------");
 	            if(pdpano+1 != l->n)
 	            	printf("+");
-	            
+
 	            pdpano++;
 				if(pdpano == l->n)
 					break;
@@ -779,7 +779,7 @@ void imprime2(char nomeTabela[], column * l) {
         		printf("|");
             j++;
     	}
-    	
+
 		free(pagina);
 		x -= bufferpoll[p++].nrec;
 		column * q;
@@ -789,7 +789,7 @@ void imprime2(char nomeTabela[], column * l) {
 			free(q->valorCampo);
 			free(q);
 			q = a;
-		}	
+		}
     }
     printf("\n(%d %s)\n\n",ntuples,(1>=ntuples)?"row": "rows");
 
@@ -886,15 +886,43 @@ void imprime(char nomeTabela[]) {
 }
 
 
+int attr_in_table(column * attr, char nomeTabela[]){
+	struct fs_objects objeto;
+	tp_table * esquema;
+	tp_table * p;
+	column * q;
+	int f = 0;
+
+  if(!verificaNomeTabela(nomeTabela)){
+      printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
+      return -1;
+  }
+
+  objeto = leObjeto(nomeTabela);
+  esquema = leSchema(objeto);
+
+	for(q = attr; q != NULL; q = q->next){
+    f = 0;
+    for(p = esquema; p != NULL; p = p->next){
+			if(strcmp(q->nomeCampo, p->nome) == 0 && strcmp(nomeTabela, q->nome) == 0){
+				f = 1;
+				break;
+			}
+		}
+    if(f == 0) return -1;
+	}
+
+  return 0;
+}
+
 void pulpfic(column * mineiro, char nomeTabela[]){
     if(mineiro != NULL){
-		printf("atributos\n");
-		imprime2(nomeTabela, mineiro);
+		if(attr_in_table(mineiro, nomeTabela) == 0){
+			imprime2(nomeTabela, mineiro);
+		}
+		else printf("\nERROR: wrong attributes or table name.\n\n\n");
 	}
-	else{
-		printf("asterisco\n");
-		imprime(nomeTabela);
-	}
+	else imprime(nomeTabela);
 }
 
 
