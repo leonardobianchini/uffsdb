@@ -622,8 +622,12 @@ column * select_list(column * pages, column * attr, int num){
 			novo = (column *)malloc(sizeof(column));
 			novo->tipoCampo = p[i].tipoCampo;
 			strcpy(novo->nomeCampo, p[i].nomeCampo);
+			
+			printf("valorCampo antes: %d\n", *(int *)p[i].valorCampo);
 			novo->valorCampo = malloc(strlen(p[i].valorCampo)+1);
 			strcpy(novo->valorCampo, p[i].valorCampo);
+			printf("valorCampo depois: %d\n", *(int *)novo->valorCampo);
+			
 			strcpy(novo->nome, p[i].nome);
 			novo->next = NULL;
 			novo->n = 0;
@@ -645,6 +649,8 @@ column * select_list(column * pages, column * attr, int num){
 			}
 		}
 	}
+	for(q = newList; q != NULL; q = q->next)
+		printf("lista pronta: %d\n", *(int *)q->valorCampo);
 	return newList;
 }
 
@@ -739,12 +745,17 @@ void imprime2(char nomeTabela[], column * l) {
 		for(j = 0; j < selected->n; j++){
         	if(pagina[j].tipoCampo == 'S')
             	printf(" %-20s ", pagina[j].valorCampo);
+            	
         	else if(pagina[j].tipoCampo == 'I'){
-            int *n = (int *)&pagina[j].valorCampo[0];
-            printf(" %-10d ", *n);
-        	} else if(pagina[j].tipoCampo == 'C'){
+				int *n = (int *)&pagina[j].valorCampo[0];
+				printf(" %-10d ", *n);
+        	}
+
+        	else if(pagina[j].tipoCampo == 'C'){
             	printf(" %-10c ", pagina[j].valorCampo[0]);
-        	} else if(pagina[j].tipoCampo == 'D'){
+        	}
+
+        	else if(pagina[j].tipoCampo == 'D'){
             	double *n = (double *)&pagina[j].valorCampo[0];
     	        printf(" %-10f ", *n);
         	}
@@ -809,8 +820,6 @@ void imprime(char nomeTabela[]) {
             return;
 	    }
 
-		// Provavelmente é aqui que tem que mudar a lista pagina
-
 
 	    if(!cont) {
 	        for(j=0; j < objeto.qtdCampos; j++){
@@ -855,14 +864,48 @@ void imprime(char nomeTabela[]) {
     free(esquema);
 }
 
+int attr_in_table(column * attr, char nomeTabela[]){
+	struct fs_objects objeto;
+	tp_table * esquema;
+	tp_table * p;
+	column * q;
+	int f = 0;
+	
+    if(!verificaNomeTabela(nomeTabela)){
+        printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
+        return -1;
+    }
+
+    objeto = leObjeto(nomeTabela);
+    esquema = leSchema(objeto);
+	
+	
+	
+	for(p = esquema; p != NULL; p = p->next){
+		for(q = attr; q != NULL; q = q->next){
+			if(strcmp(q->nomeCampo, p->nome) == 0 && strcmp(nomeTabela, q->nome) == 0){
+				f = 1;
+				break;
+			}
+		}
+	}
+	if(f == 0){
+		return -1;
+	}
+	
+	return 0;
+}
 
 void pulpfic(column * mineiro, char nomeTabela[]){
     if(mineiro != NULL){
-		printf("atributos\n");
-		imprime2(nomeTabela, mineiro);
+		if(attr_in_table(mineiro, nomeTabela) == 0){
+			imprime2(nomeTabela, mineiro);
+		}
+		else{
+			printf("\nERROR: wrong attributes or table name.\n\n\n");
+		}
 	}
 	else{
-		printf("asterisco\n");
 		imprime(nomeTabela);
 	}
 }
