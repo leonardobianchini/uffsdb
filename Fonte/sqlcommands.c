@@ -622,20 +622,37 @@ column * select_list(column * pages, column * attr, int num){
 			novo = (column *)malloc(sizeof(column));
 			novo->tipoCampo = p[i].tipoCampo;
 			strcpy(novo->nomeCampo, p[i].nomeCampo);
-			
-			printf("valorCampo antes: %d\n", *(int *)p[i].valorCampo);
-			novo->valorCampo = malloc(strlen(p[i].valorCampo)+1);
-			strcpy(novo->valorCampo, p[i].valorCampo);
-			printf("valorCampo depois: %d\n", *(int *)novo->valorCampo);
-			
+			novo->valorCampo = malloc(sizeof(p[i].valorCampo));
+            if (p[i].tipoCampo=='S'){
+                strcpy(novo->valorCampo, p[i].valorCampo);
+            }
+            else if (p[i].tipoCampo=='I'){
+                int *n = (int *)&p[i].valorCampo[0];
+                novo->valorCampo=n;
+            }else if (p[i].tipoCampo=='D'){
+                double *nhaha = (double *)&p[i].valorCampo[0];
+                novo->valorCampo=nhaha;
+            }
 			strcpy(novo->nome, p[i].nome);
 			novo->next = NULL;
 			novo->n = 0;
 
+
+/*
+            if(p[i].tipoCampo == 'I'){
+                printf("p[i] Int: %d\n", *(int *)p[i].valorCampo);
+                printf("tam int %ld   tam p int %ld\n",sizeof(int), sizeof(p[i].tipoCampo));
+            }
+            if(novo->tipoCampo == 'I'){
+                printf("novo Int: %d\n", *(int *)novo->valorCampo);
+                printf("tam int %ld   tam novo int %ld\n",sizeof(int), sizeof(novo->tipoCampo));
+            }
+*/
+
 			if(newList->n == 0){
 				newList = novo;
 				novo = NULL;
-				newList->n = 1;;
+				newList->n = 1;
 			}
 			else{
 				for(q = newList; q != NULL; q = q->next){
@@ -649,8 +666,6 @@ column * select_list(column * pages, column * attr, int num){
 			}
 		}
 	}
-	for(q = newList; q != NULL; q = q->next)
-		printf("lista pronta: %d\n", *(int *)q->valorCampo);
 	return newList;
 }
 
@@ -724,39 +739,36 @@ void imprime2(char nomeTabela[], column * l) {
 		column * selected;
 		selected =  select_list(pagina, l, objeto.qtdCampos*bufferpoll[p].nrec);
 
+        column * cat;
 	    if(!cont) {
-	        for(j = 0; j < l->n; j++){
-	            if(pagina[j].tipoCampo == 'S')
-	                printf(" %-20s ", pagina[j].nomeCampo);
+	        for(cat = l ; cat; cat = cat->next){
+	            if(cat->tipoCampo == 'S')
+	                printf(" %-20s ", cat->nomeCampo);
 	        	else
-	                printf(" %-10s ", pagina[j].nomeCampo);
-	            if(j < l->n - 1)
+	                printf(" %-10s ", cat->nomeCampo);
+	            if(cat->next)
 	            	printf("|");
 	        }
 	        printf("\n");
-	        for(j = 0; j < l->n; j++){
-	            printf("%s",(pagina[j].tipoCampo == 'S')? "----------------------": "------------");
-	            if(j < l->n - 1)
+	        for(cat = l ; cat; cat = cat->next){
+	            printf("%s",(cat->tipoCampo == 'S')? "----------------------": "------------");
+	            if(cat->next)
 	            	printf("+");
 	        }
 	        printf("\n");
 	    }
 	    cont++;
-		for(j = 0; j < selected->n; j++){
-        	if(pagina[j].tipoCampo == 'S')
-            	printf(" %-20s ", pagina[j].valorCampo);
-            	
-        	else if(pagina[j].tipoCampo == 'I'){
-				int *n = (int *)&pagina[j].valorCampo[0];
-				printf(" %-10d ", *n);
-        	}
-
-        	else if(pagina[j].tipoCampo == 'C'){
-            	printf(" %-10c ", pagina[j].valorCampo[0]);
-        	}
-
-        	else if(pagina[j].tipoCampo == 'D'){
-            	double *n = (double *)&pagina[j].valorCampo[0];
+        j=0;
+		for(cat=selected;cat; cat =  cat->next){
+        	if(cat->tipoCampo == 'S')
+            	printf(" %-20s ", cat->valorCampo);
+        	else if(cat->tipoCampo == 'I'){
+            int *n = (int *)&cat->valorCampo[0];
+            printf(" %-10d ", *n);
+        } else if(cat->tipoCampo == 'C'){
+            	printf(" %-10c ", cat->valorCampo[0]);
+        	} else if(cat->tipoCampo == 'D'){
+            	double *n = (double *)&cat->valorCampo[0];
     	        printf(" %-10f ", *n);
         	}
 
@@ -764,9 +776,20 @@ void imprime2(char nomeTabela[], column * l) {
             	printf("\n");
         	else
         		printf("|");
+            j++;
     	}
       free(pagina);
     	x -= bufferpoll[p++].nrec;
+      column * q;
+      column * a;
+      for(q = selected; q;){
+          a = q->next;
+          free(q->valorCampo);
+          free(q);
+          q = a;
+      }
+
+
     }
     printf("\n(%d %s)\n\n",ntuples,(1>=ntuples)?"row": "rows");
 
@@ -820,6 +843,8 @@ void imprime(char nomeTabela[]) {
             return;
 	    }
 
+		// Provavelmente é aqui que tem que mudar a lista pagina
+
 
 	    if(!cont) {
 	        for(j=0; j < objeto.qtdCampos; j++){
@@ -864,48 +889,14 @@ void imprime(char nomeTabela[]) {
     free(esquema);
 }
 
-int attr_in_table(column * attr, char nomeTabela[]){
-	struct fs_objects objeto;
-	tp_table * esquema;
-	tp_table * p;
-	column * q;
-	int f = 0;
-	
-    if(!verificaNomeTabela(nomeTabela)){
-        printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
-        return -1;
-    }
-
-    objeto = leObjeto(nomeTabela);
-    esquema = leSchema(objeto);
-	
-	
-	
-	for(p = esquema; p != NULL; p = p->next){
-		for(q = attr; q != NULL; q = q->next){
-			if(strcmp(q->nomeCampo, p->nome) == 0 && strcmp(nomeTabela, q->nome) == 0){
-				f = 1;
-				break;
-			}
-		}
-	}
-	if(f == 0){
-		return -1;
-	}
-	
-	return 0;
-}
 
 void pulpfic(column * mineiro, char nomeTabela[]){
     if(mineiro != NULL){
-		if(attr_in_table(mineiro, nomeTabela) == 0){
-			imprime2(nomeTabela, mineiro);
-		}
-		else{
-			printf("\nERROR: wrong attributes or table name.\n\n\n");
-		}
+		printf("atributos\n");
+		imprime2(nomeTabela, mineiro);
 	}
 	else{
+		printf("asterisco\n");
 		imprime(nomeTabela);
 	}
 }
