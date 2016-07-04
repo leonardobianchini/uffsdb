@@ -22,7 +22,7 @@
   #include "dictionary.h"
 #endif
 
-/* ---------------------------------------------------------------------------------------------- 
+/* ----------------------------------------------------------------------------------------------
     Objetivo:   Recebe o nome de uma tabela e engloba as funções leObjeto() e leSchema().
     Parametros: Nome da Tabela, Objeto da Tabela e tabela.
     Retorno:    tp_table
@@ -592,7 +592,7 @@ void insert(rc_insert *s_insert) {
 //	Testa se a está em b. Não exatamente isso, mas nesse sentido
 int inList(column *a, column *b){
 	column *p;
-	
+
 	for(p = b; p != NULL; p = p->next){
 		if(strcmp(a->nomeCampo, p->nomeCampo) == 0){
 			return 1;
@@ -607,16 +607,16 @@ column * select_list(column * pages, column * attr, int num){
 	column * p = pages;
 	column * q;
 	column * novo;
-	
+
 	column * newList;
 	newList = (column *)malloc(sizeof(column));
 	newList->n = 0;
 	newList->next = NULL;
-	
+
 	if(pages == NULL)
 		return NULL;
-	
-	
+
+
 	for(i = 0; i < num; i++){
 		if(inList(&p[i], attr)){
 			novo = (column *)malloc(sizeof(column));
@@ -627,13 +627,13 @@ column * select_list(column * pages, column * attr, int num){
 			strcpy(novo->nome, p[i].nome);
 			novo->next = NULL;
 			novo->n = 0;
-			
+
 			if(newList->n == 0){
 				newList = novo;
 				novo = NULL;
 				newList->n = 1;;
 			}
-			else{				
+			else{
 				for(q = newList; q != NULL; q = q->next){
 					if(q->next == NULL){
 						q->next = novo;
@@ -653,7 +653,7 @@ column * list_like_page(column * lista){
 	column * p;
 	column * page;
 	page = (column *)malloc(sizeof(column) * lista->n);
-	
+
 	for(p = lista; p != NULL; p = p->next){
 		page[i].tipoCampo = p->tipoCampo;
 		strcpy(page[i].nomeCampo, p->nomeCampo);
@@ -662,7 +662,7 @@ column * list_like_page(column * lista){
 		page[i].n = p->n;
 		strcpy(page[i].nome, p->nome);
 		page[i].next = p->next;
-		
+
 		i++;
 	}
 	free(p);
@@ -670,10 +670,10 @@ column * list_like_page(column * lista){
 }
 
 void imprime2(char nomeTabela[], column * l) {
-	
+
     int j,erro, x, p, cont=0;
     struct fs_objects objeto;
-	
+
     if(!verificaNomeTabela(nomeTabela)){
         printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
         return;
@@ -704,8 +704,9 @@ void imprime2(char nomeTabela[], column * l) {
 
     int ntuples = --x;
 	p = 0;
+  column *pagina = NULL;
 	while(x){
-	    column *pagina = getPage(bufferpoll, esquema, objeto, p);
+	    pagina = getPage(bufferpoll, esquema, objeto, p);
 	    if(pagina == ERRO_PARAMETRO){
             printf("ERROR: could not open the table.\n");
             free(bufferpoll);
@@ -714,16 +715,8 @@ void imprime2(char nomeTabela[], column * l) {
 	    }
 
 
-		
-		// Provavelmente é aqui que tem que mudar a lista pagina		
-		
 		column * selected;
 		selected =  select_list(pagina, l, objeto.qtdCampos*bufferpoll[p].nrec);
-		pagina = list_like_page(selected);
-		//
-		
-		
-		// select oi.a from oi;
 
 	    if(!cont) {
 	        for(j = 0; j < l->n; j++){
@@ -747,25 +740,28 @@ void imprime2(char nomeTabela[], column * l) {
         	if(pagina[j].tipoCampo == 'S')
             	printf(" %-20s ", pagina[j].valorCampo);
         	else if(pagina[j].tipoCampo == 'I'){
-            	printf(" %-10d ", pagina[j].valorCampo[0]);
+            int *n = (int *)&pagina[j].valorCampo[0];
+            printf(" %-10d ", *n);
         	} else if(pagina[j].tipoCampo == 'C'){
             	printf(" %-10c ", pagina[j].valorCampo[0]);
         	} else if(pagina[j].tipoCampo == 'D'){
             	double *n = (double *)&pagina[j].valorCampo[0];
     	        printf(" %-10f ", *n);
         	}
-        	
+
             if((j+1) % l->n == 0)
             	printf("\n");
         	else
         		printf("|");
     	}
+      free(pagina);
     	x -= bufferpoll[p++].nrec;
     }
     printf("\n(%d %s)\n\n",ntuples,(1>=ntuples)?"row": "rows");
 
     free(bufferpoll);
     free(esquema);
+
 }
 
 
@@ -812,10 +808,10 @@ void imprime(char nomeTabela[]) {
             free(esquema);
             return;
 	    }
-		
+
 		// Provavelmente é aqui que tem que mudar a lista pagina
-		
-		
+
+
 	    if(!cont) {
 	        for(j=0; j < objeto.qtdCampos; j++){
 	            if(pagina[j].tipoCampo == 'S')
@@ -860,7 +856,7 @@ void imprime(char nomeTabela[]) {
 }
 
 
-void pulpfic(column * mineiro, char nomeTabela[]){   
+void pulpfic(column * mineiro, char nomeTabela[]){
     if(mineiro != NULL){
 		printf("atributos\n");
 		imprime2(nomeTabela, mineiro);
@@ -1123,8 +1119,8 @@ void createTable(rc_insert *t) {
         printf("ERROR: The tables name is to long\n");
         return;
     }
-    
-    
+
+
 	int size;
     strcpylower(t->objName, t->objName);        //muda pra minúsculo
     char *tableName = (char*) malloc (sizeof(char)*TAMANHO_NOME_TABELA),
