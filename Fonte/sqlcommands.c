@@ -926,11 +926,12 @@ column * insert_column_list(column * l, column * novo){
 
 	if(l == NULL){
         l = novo;
-        l->n++;
+        novo->next=NULL;
+        l->n = 1;
     }
 	else{
 		for(p = l; p != NULL; p = p->next){
-			if(p->next == NULL){
+            if(p->next == NULL){
 				p->next = novo;
 				novo->next = NULL;
                 l->n++;
@@ -962,7 +963,6 @@ column * table_to_list(char nomeTabela[]){
         strcpy(novo->nome, nomeTabela);
         novo->tipoCampo = p->tipo;
         //printf("nomeCampo: %s, nome: %s, tipo: %c\n", novo->nomeCampo, novo->nome, novo->tipoCampo);
-
         l = insert_column_list(l, novo);
     }
     return l;
