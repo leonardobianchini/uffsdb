@@ -629,9 +629,14 @@ column * select_list(column * pages, column * attr, int num){
             else if (p[i].tipoCampo=='I'){
                 int *n = (int *)&p[i].valorCampo[0];
                 novo->valorCampo=(char *)n;
-            }else if (p[i].tipoCampo=='D'){
+            }
+            else if (p[i].tipoCampo=='D'){
                 double *nhaha = (double *)&p[i].valorCampo[0];
                 novo->valorCampo=(char *)nhaha;
+            }
+            else if (p[i].tipoCampo=='C'){
+                char *nh = (char *)&p[i].valorCampo[0];
+                novo->valorCampo=(char *)nh;
             }
 			strcpy(novo->nome, p[i].nome);
 			novo->next = NULL;
