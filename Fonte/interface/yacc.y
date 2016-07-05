@@ -50,7 +50,7 @@ int yywrap() {
         LIST_TABLES LIST_TABLE  ALPHANUM    CONNECT     HELP
         LIST_DBASES CLEAR       CONTR		WHERE		ARITMETIC
         RELATIONAL	LOGICAL		AND			OR          ASTERISCO
-        MAIS        MENOS       ABRE_P      FECHA_P;
+        MAIS        MENOS;
 
 %%
 
@@ -73,9 +73,8 @@ exit_program: QUIT {exit(0);};
 
 clear: CLEAR {clear(); GLOBAL_PARSER.consoleFlag = 1; return 0;};
 
-parentesis_open: ABRE_P {GLOBAL_PARSER.parentesis++;};
-
-parentesis_close: FECHA_P {GLOBAL_PARSER.parentesis--;};
+parentesis_open: '(' {GLOBAL_PARSER.parentesis++;};
+parentesis_close: ')' {GLOBAL_PARSER.parentesis--;};
 
 /* TABLE ATTRIBUTES */
 table_attr: LIST_TABLE OBJECT {
@@ -211,7 +210,7 @@ numero: NUMBER {GLOBAL_PARSER.step++;}
 valor: VALUE {GLOBAL_PARSER.step++;}
     | sinal {getToken(yylval.strval,WT_SINAL);} VALUE {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_VALUE);}
 
-paren: operand paren2 | ABRE_P {getToken(yylval.strval, WT_PARENTESES);} paren FECHA_P {getToken(yylval.strval, WT_PARENTESES);} paren2
+paren: operand paren2 | '(' {getToken(yylval.strval, WT_ABRE_P);} paren ')' {getToken(yylval.strval, WT_FECHA_P);} paren2
 paren2: /* nothing */
 	| ARITMETIC {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_ARITMETIC);} paren
     | sinal {getToken(yylval.strval, WT_SINAL);} paren
@@ -219,7 +218,7 @@ paren2: /* nothing */
 
 equation: paren RELATIONAL {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_RELATIONAL);} paren
 
-logical_oper: equation lo | ABRE_P {getToken(yylval.strval, WT_PARENTESES);} logical_oper FECHA_P {getToken(yylval.strval, WT_PARENTESES);} lo
+logical_oper: equation lo | '(' {getToken(yylval.strval, WT_ABRE_P);} logical_oper ')' {getToken(yylval.strval, WT_FECHA_P);} lo
 lo: /* nothing */
 	| logico logical_oper
 

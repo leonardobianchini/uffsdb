@@ -81,9 +81,7 @@ extern int yydebug;
     OR = 291,
     ASTERISCO = 292,
     MAIS = 293,
-    MENOS = 294,
-    ABRE_P = 295,
-    FECHA_P = 296
+    MENOS = 294
   };
 #endif
 /* Tokens.  */
@@ -124,8 +122,6 @@ extern int yydebug;
 #define ASTERISCO 292
 #define MAIS 293
 #define MENOS 294
-#define ABRE_P 295
-#define FECHA_P 296
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -139,7 +135,7 @@ union YYSTYPE
     int subtok;
     char *strval;
 
-#line 143 "y.tab.h" /* yacc.c:1909  */
+#line 139 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

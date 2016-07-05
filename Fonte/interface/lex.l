@@ -45,11 +45,12 @@ help							return HELP;
 [,]								return *yytext;
 [;]								return *yytext;
 [.]								return *yytext;
+[(]								return *yytext;
+[)]								return *yytext;
 
 
 [*]	                    			{yylval.strval = yytext; return ASTERISCO;};
-[(]	                    			{yylval.strval = yytext; return ABRE_P;};
-[)]	                    			{yylval.strval = yytext; return FECHA_P;};
+
 [aA][nN][dD]	                   	{yylval.strval = yytext; return AND;};
 [oO][rR]    	                   	{yylval.strval = yytext; return OR;};
 [+]	                    			{yylval.strval = yytext; return MAIS;};

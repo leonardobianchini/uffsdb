@@ -39,9 +39,9 @@ w_token *token_list = NULL;
 
 void insert_token_list(w_token * nodo){
     w_token *p;
-	
+
 	if(token_list == NULL) token_list = nodo;
-        
+
 	else{
 		for(p = token_list; p != NULL; p = p->next){
 			if(p->next == NULL){
@@ -76,7 +76,7 @@ void null_list(){
         p = a;
 	}
     token_list = NULL;
-    
+
     column *q;
     column *b;
 	for(q = select_attributes; q;){
@@ -90,17 +90,17 @@ void null_list(){
 void start_list(){
 	select_attributes = (column *)malloc(sizeof(column));
 	select_attribute = (column *)malloc(sizeof(column));
-	
+
 	select_attributes->next = NULL;
 	select_attributes->n = 0;
-	
+
 	select_attribute->next = NULL;
 	select_attribute->n = 0;
 }
 
 void push_list(){
 	column *p;
-	
+
 	if(select_attributes->n == 0){
 		select_attributes = select_attribute;
 		select_attributes->n++;
@@ -140,7 +140,7 @@ void getAttr(int op, char **nome){
 		//select_attribute->nomeCampo = *nome;
 		strcpy(select_attribute->nomeCampo, *nome);
 		push_list();
-		
+
 		select_attribute = (column *)malloc(sizeof(column));
 		select_attribute->next = NULL;
 		select_attribute->n = 0;

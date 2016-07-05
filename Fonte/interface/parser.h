@@ -22,7 +22,8 @@
 #define WT_RELATIONAL     	8
 #define WT_LOGICO          	9
 #define WT_VALUE            10
-#define WT_PARENTESES       11
+#define WT_ABRE_P           11
+#define WT_FECHA_P          12
 
 /* Estrutura global que guarda as informações obtidas pelo yacc
  * na identificação dos tokens
