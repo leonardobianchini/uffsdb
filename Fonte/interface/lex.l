@@ -19,8 +19,6 @@
 
 (?i:INSERT)						return INSERT;
 (?i:WHERE)						return WHERE;
-(?i:AND)						return AND;
-(?i:OR)							return OR;
 (?i:INTO)						return INTO;
 (?i:VALUES)						return VALUES;
 (?i:SELECT)						return SELECT;
@@ -46,14 +44,16 @@ help							return HELP;
 
 [,]								return *yytext;
 [;]								return *yytext;
-[*]								return *yytext;
-[(]								return *yytext;
-[)]								return *yytext;
 [.]								return *yytext;
-[-]								return *yytext;
-[+]								return *yytext;
 
 
+[*]	                    			{yylval.strval = yytext; return ASTERISCO;};
+[(]	                    			{yylval.strval = yytext; return ABRE_P;};
+[)]	                    			{yylval.strval = yytext; return FECHA_P;};
+[aA][nN][dD]	                   	{yylval.strval = yytext; return AND;};
+[oO][rR]    	                   	{yylval.strval = yytext; return OR;};
+[+]	                    			{yylval.strval = yytext; return MAIS;};
+[-]	                    			{yylval.strval = yytext; return MENOS;};
 ([a-zA-Z_]+[0-9_]*)+				{yylval.strval = yytext; return OBJECT;};
 [\']([^'])+[\']			  			{yylval.strval = yytext; return ALPHANUM;};
 [0-9]+\.[0-9]+						{yylval.strval = yytext; return VALUE;};
@@ -61,7 +61,6 @@ help							return HELP;
 ([%]|[/])							{yylval.strval = yytext; return ARITMETIC;}
 ([>][=]|[<][=]|[=]|[!][=]|[>]|[<])	{yylval.strval = yytext; return RELATIONAL;}
 
-L?\"(\\.|[^\\"])*\"					{return(STRING_LITERAL); }
 
 
 

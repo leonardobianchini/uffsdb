@@ -49,7 +49,8 @@ int yywrap() {
         DROP        OBJECT      NUMBER      VALUE       QUIT
         LIST_TABLES LIST_TABLE  ALPHANUM    CONNECT     HELP
         LIST_DBASES CLEAR       CONTR		WHERE		ARITMETIC
-        RELATIONAL	LOGICAL		AND			OR			STRING_LITERAL;
+        RELATIONAL	LOGICAL		AND			OR          ASTERISCO
+        MAIS        MENOS       ABRE_P      FECHA_P;
 
 %%
 
@@ -72,9 +73,9 @@ exit_program: QUIT {exit(0);};
 
 clear: CLEAR {clear(); GLOBAL_PARSER.consoleFlag = 1; return 0;};
 
-parentesis_open: '(' {GLOBAL_PARSER.parentesis++;};
+parentesis_open: ABRE_P {GLOBAL_PARSER.parentesis++;};
 
-parentesis_close: ')' {GLOBAL_PARSER.parentesis--;};
+parentesis_close: FECHA_P {GLOBAL_PARSER.parentesis--;};
 
 /* TABLE ATTRIBUTES */
 table_attr: LIST_TABLE OBJECT {
@@ -186,7 +187,7 @@ select: SELECT {setMode(OP_SELECT_ALL); null_list();} pos_select FROM table_sele
 
 table_select: OBJECT {setObjName(yytext);};
 
-pos_select: '*' {getAttr(-1, yytext);} | OBJECT {clear_list(); GLOBAL_PARSER.step++; getAttr(0, yytext);} '.' OBJECT {GLOBAL_PARSER.step++; getAttr(1, yytext);} pos_select2
+pos_select: ASTERISCO {getAttr(-1, yytext);} | OBJECT {clear_list(); GLOBAL_PARSER.step++; getAttr(0, yytext);} '.' OBJECT {GLOBAL_PARSER.step++; getAttr(1, yytext);} pos_select2
 pos_select2:    | ',' pos_select3
 pos_select3: OBJECT {GLOBAL_PARSER.step++; getAttr(0, yytext);} '.' OBJECT {GLOBAL_PARSER.step++; getAttr(1, yytext);} pos_select2
 
@@ -195,33 +196,35 @@ where:
 	| WHERE {GLOBAL_PARSER.step++;} logical_oper;
 
 
-operand:	OBJECT {GLOBAL_PARSER.step++; } '.' OBJECT {GLOBAL_PARSER.step++;} 
-		| valor
-		| numero
-		| STRING_LITERAL
-        
-sinal: '+' | '-'    
+operand:	OBJECT {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_OBJECT);} '.' OBJECT {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_OBJECT);} 
+		| valor {getToken(yylval.strval,WT_VALOR);}
+		| numero {getToken(yylval.strval,WT_NUMERO);}
+		| ALPHANUM {getToken(yylval.strval,WT_ALPHANUM);}
+
+/* select * from oi where */
+
+sinal: MAIS | MENOS
     
 numero: NUMBER {GLOBAL_PARSER.step++;}
     |   sinal NUMBER {GLOBAL_PARSER.step++;}
 
 valor: VALUE {GLOBAL_PARSER.step++;}
-    | sinal VALUE {GLOBAL_PARSER.step++;}
+    | sinal {getToken(yylval.strval,WT_SINAL);} VALUE {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_VALUE);}
 
-paren: operand paren2 | '(' paren ')' paren2
+paren: operand paren2 | ABRE_P paren FECHA_P paren2
 paren2: /* nothing */
-	| ARITMETIC {GLOBAL_PARSER.step++;} paren
-    | sinal paren
-    | '*' paren
+	| ARITMETIC {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_ARITMETIC);} paren
+    | sinal {getToken(yylval.strval, WT_SINAL);} paren
+    | ASTERISCO {getToken(yylval.strval, WT_ASTERISCO);} paren
 
-equation: paren RELATIONAL {GLOBAL_PARSER.step++;} paren
+equation: paren RELATIONAL {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_RELATIONAL);} paren
 
-logical_oper: equation lo | '(' logical_oper ')' lo
+logical_oper: equation lo | ABRE_P logical_oper FECHA_P lo
 lo: /* nothing */
 	| logico logical_oper
 
-logico: AND {GLOBAL_PARSER.step++;}
-	| OR {GLOBAL_PARSER.step++;}
+logico: AND {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_LOGICO);}
+	| OR {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_LOGICO);}
 
 
 /* END */

@@ -12,6 +12,18 @@
 #define OP_DROP_DATABASE 	5
 #define OP_SELECT_ALL 		6
 
+#define WT_NUMERO       	1
+#define WT_VALOR       		2
+#define WT_ALPHANUM         3
+#define WT_OBJECT           4
+#define WT_SINAL            5
+#define WT_ARITMETIC        6
+#define WT_ASTERISCO       	7
+#define WT_RELATIONAL     	8
+#define WT_LOGICO          	9
+#define WT_VALUE            10
+#define WT_PARENTESES       11
+
 /* Estrutura global que guarda as informações obtidas pelo yacc
  * na identificação dos tokens
  */
@@ -113,3 +125,7 @@ void clear_list();
 void getAttr(int op, char **nome);
 
 void null_list();
+
+void getToken(char * token, int type);
+
+void insert_token_list(w_token * nodo);

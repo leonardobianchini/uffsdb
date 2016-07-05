@@ -92,6 +92,14 @@ union c_int{
     char cnum[sizeof(int)];
 };
 
+typedef struct w_token {
+    int         tipo;
+    void *      valor;
+    struct w_token * next;
+}w_token;
+
+
+
 /************************************************************************************************
 **************************************  VARIAVEIS GLOBAIS  **************************************/
 

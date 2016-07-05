@@ -35,8 +35,55 @@ rc_parser GLOBAL_PARSER;
 
 column *select_attributes = NULL;
 column *select_attribute = NULL;
+w_token *token_list = NULL;
+
+void insert_token_list(w_token * nodo){
+    w_token *p;
+	
+	if(token_list == NULL) token_list = nodo;
+        
+	else{
+		for(p = token_list; p != NULL; p = p->next){
+			if(p->next == NULL){
+				p->next = nodo;
+				nodo->next = NULL;
+				break;
+			}
+		}
+	}
+}
+
+
+void getToken(char * token, int type){
+    w_token *novo;
+    novo = (w_token *)malloc(sizeof(w_token));
+    printf("token: %s  tipo=%d\n", token, type);
+    novo->tipo = type;
+    novo->next = NULL;
+    novo->valor=(void *)malloc(sizeof(token));
+    strcpy(novo->valor,token);
+    insert_token_list(novo);
+    novo = NULL;
+}
+
 
 void null_list(){
+    w_token *p;
+    w_token *a;
+	for(p = token_list; p;){
+		a = p->next;
+        free(p);
+        p = a;
+	}
+    token_list = NULL;
+    
+    column *q;
+    column *b;
+	for(q = select_attributes; q;){
+		b = q->next;
+        free(q);
+        q = b;
+	}
 	select_attributes = NULL;
 }
 
@@ -315,6 +362,10 @@ int interface() {
                             break;
                         case OP_SELECT_ALL:
                             pulpfic(select_attributes, GLOBAL_DATA.objName);
+                            w_token *jujuba;
+                            for(jujuba=token_list;jujuba;jujuba=jujuba->next){
+                                printf("jujuba=%s\n",(char*)jujuba->valor);
+                            }
                             break;
                         case OP_CREATE_TABLE:
                             createTable(&GLOBAL_DATA);
