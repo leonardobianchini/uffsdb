@@ -192,11 +192,11 @@ pos_select2:    | ',' pos_select3
 pos_select3: OBJECT {GLOBAL_PARSER.step++; getAttr(0, yytext);} '.' OBJECT {GLOBAL_PARSER.step++; getAttr(1, yytext);} pos_select2
 
 
-where:  
+where:
 	| WHERE {GLOBAL_PARSER.step++;} logical_oper;
 
 
-operand:	OBJECT {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_OBJECT);} '.' OBJECT {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_OBJECT);} 
+operand:	OBJECT {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_OBJECT);} '.' OBJECT {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_OBJECT);}
 		| valor {getToken(yylval.strval,WT_VALOR);}
 		| numero {getToken(yylval.strval,WT_NUMERO);}
 		| ALPHANUM {getToken(yylval.strval,WT_ALPHANUM);}
@@ -204,14 +204,14 @@ operand:	OBJECT {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_OBJECT);} '.' O
 /* select * from oi where */
 
 sinal: MAIS | MENOS
-    
+
 numero: NUMBER {GLOBAL_PARSER.step++;}
     |   sinal NUMBER {GLOBAL_PARSER.step++;}
 
 valor: VALUE {GLOBAL_PARSER.step++;}
     | sinal {getToken(yylval.strval,WT_SINAL);} VALUE {GLOBAL_PARSER.step++; getToken(yylval.strval,WT_VALUE);}
 
-paren: operand paren2 | ABRE_P paren FECHA_P paren2
+paren: operand paren2 | ABRE_P {getToken(yylval.strval, WT_PARENTESES);} paren FECHA_P {getToken(yylval.strval, WT_PARENTESES);} paren2
 paren2: /* nothing */
 	| ARITMETIC {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_ARITMETIC);} paren
     | sinal {getToken(yylval.strval, WT_SINAL);} paren
@@ -219,7 +219,7 @@ paren2: /* nothing */
 
 equation: paren RELATIONAL {GLOBAL_PARSER.step++; getToken(yylval.strval, WT_RELATIONAL);} paren
 
-logical_oper: equation lo | ABRE_P logical_oper FECHA_P lo
+logical_oper: equation lo | ABRE_P {getToken(yylval.strval, WT_PARENTESES);} logical_oper FECHA_P {getToken(yylval.strval, WT_PARENTESES);} lo
 lo: /* nothing */
 	| logico logical_oper
 
