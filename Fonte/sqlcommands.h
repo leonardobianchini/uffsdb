@@ -38,7 +38,7 @@ int finalizaInsert(char *, column *);
 /*
 Essa função é a receita do sucesso
 */
-void pulpfic(column *, char []);
+void pulpfic(column *, char [], w_token *);
 
 void imprime(char [] );
 /* ----------------------------------------------------------------------------------------------
@@ -101,9 +101,9 @@ int verifyFieldName(char **, int );
 ////
 int verifyFK(char *, char *);
 
-void imprime2(char nomeTabela[], column * l);
+void imprime2(char nomeTabela[], column * l, w_token * token_list);
 
-column * select_list(column * pages, column * attr, int num);
+column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list);
 
 int inList(column *a, column *b);
 

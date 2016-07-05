@@ -602,11 +602,13 @@ int inList(column *a, column *b){
 }
 
 
-column * select_list(column * pages, column * attr, int num){
-	int i;
+column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list){
+	int i, num = nAttr*nTuplas, j;
 	column * p = pages;
 	column * q;
 	column * novo;
+	column * t;
+    column * tupla = (column *)malloc(sizeof(column) * nAttr);
 
 	column * newList;
 	newList = (column *)malloc(sizeof(column));
@@ -618,6 +620,25 @@ column * select_list(column * pages, column * attr, int num){
 
 
 	for(i = 0; i < num; i++){
+
+        if(i%nAttr == 0){
+            t = &p[i];
+            for(j = 0; j < nAttr; j++){
+                tupla[j] = p[i+j];
+            }
+            /*
+            for(j = 0; j < nAttr; j++){
+                if(tupla[j].tipoCampo == 'I')
+                    printf("ValorTupla%d: %d\n", j, *(int *)tupla[j].valorCampo);
+                else if(tupla[j].tipoCampo == 'S')
+                    printf("ValorTupla%d: %s\n", j, tupla[j].valorCampo);
+                else if(tupla[j].tipoCampo == 'D')
+                    printf("ValorTupla%d: %lf\n", j, *(double *)tupla[j].valorCampo);
+                else if(tupla[j].tipoCampo == 'C')
+                    printf("ValorTupla%d: %c\n", j, tupla[j].valorCampo[0]);
+
+            }*/
+        }
 		if(inList(&p[i], attr)){
 			novo = (column *)malloc(sizeof(column));
 			novo->tipoCampo = p[i].tipoCampo;
@@ -684,7 +705,7 @@ column * list_like_page(column * lista){
 	return page;
 }
 
-void imprime2(char nomeTabela[], column * l) {
+void imprime2(char nomeTabela[], column * l, w_token * token_list) {
 
     int j,erro, x, p, cont=0;
     struct fs_objects objeto;
@@ -728,10 +749,15 @@ void imprime2(char nomeTabela[], column * l) {
             free(esquema);
             return;
 	    }
+        //aqui faz o where
+//        printf ("\nntuples= %d, objeto.qtdCampos= %d, bufferpoll[p].nrec= %d\n",ntuples, objeto.qtdCampos,bufferpoll[p].nrec );
 
+
+        //sim é aqui mesmo, tenho certeza by:becker
 
 		column * selected;
-		selected =  select_list(pagina, l, objeto.qtdCampos*bufferpoll[p].nrec);
+		selected = select_list(pagina, l, objeto.qtdCampos, bufferpoll[p].nrec, token_list);
+
 
         column * cat;
         int pdpano = 0;
@@ -968,15 +994,15 @@ column * table_to_list(char nomeTabela[]){
     return l;
 }
 
-void pulpfic(column * mineiro, char nomeTabela[]){
+void pulpfic(column * mineiro, char nomeTabela[], w_token * token_list){
     if(mineiro != NULL){
 		if(attr_in_table(mineiro, nomeTabela) == 0){
-			imprime2(nomeTabela, mineiro);
+			imprime2(nomeTabela, mineiro, token_list);
 		}
 		else printf("\nERROR: wrong attributes or table name.\n\n\n");
 	}
 	else{
-        imprime2(nomeTabela, table_to_list(nomeTabela));
+        imprime2(nomeTabela, table_to_list(nomeTabela), token_list);
     }
 }
 

@@ -57,17 +57,19 @@ void insert_token_list(w_token * nodo){
 void getToken(char * token, int type){
     w_token *novo;
     novo = (w_token *)malloc(sizeof(w_token));
-    printf("token: %s  tipo=%d\n", token, type);
+    //printf("token: %s  tipo=%d\n", token, type);
 
     novo->tipo = type;
     novo->next = NULL;
     if(type == WT_ABRE_P){
-        char c='(';
-        novo->valor=&c;
+        char *c = (char *)malloc(sizeof(char));
+        *c = '(';
+        novo->valor=c;
     }
     else if(type == WT_FECHA_P){
-        char c=')';
-        novo->valor=&c;
+        char *c = (char *)malloc(sizeof(char));
+        *c = ')';
+        novo->valor=c;
     }
     else{
         novo->valor=(void *)malloc(sizeof(token));
@@ -373,11 +375,11 @@ int interface() {
                                 printf("WARNING: Nothing to be inserted. Command ignored.\n");
                             break;
                         case OP_SELECT_ALL:
-                            pulpfic(select_attributes, GLOBAL_DATA.objName);
-                            w_token *jujuba;
+                            pulpfic(select_attributes, GLOBAL_DATA.objName, token_list);
+                            /*w_token *jujuba;
                             for(jujuba=token_list;jujuba;jujuba=jujuba->next){
                                 printf("jujuba = %s\n",(char*)jujuba->valor);
-                            }
+                            }*/
                             break;
                         case OP_CREATE_TABLE:
                             createTable(&GLOBAL_DATA);
