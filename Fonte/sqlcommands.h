@@ -108,3 +108,7 @@ column * select_list(column * pages, column * attr, int num);
 int inList(column *a, column *b);
 
 column * list_like_page(column * lista);
+
+column * table_to_list(char nomeTabela[]);
+
+column * insert_column_list(column * l, column * novo);

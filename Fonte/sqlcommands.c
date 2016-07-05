@@ -902,17 +902,65 @@ int attr_in_table(column * attr, char nomeTabela[]){
   esquema = leSchema(objeto);
 
 	for(q = attr; q != NULL; q = q->next){
-    f = 0;
-    for(p = esquema; p != NULL; p = p->next){
+        f = 0;
+        for(p = esquema; p != NULL; p = p->next){
 			if(strcmp(q->nomeCampo, p->nome) == 0 && strcmp(nomeTabela, q->nome) == 0){
 				f = 1;
 				break;
 			}
-		}
-    if(f == 0) return -1;
+    	}
+        if(f == 0) return -1;
 	}
 
   return 0;
+}
+
+
+column * insert_column_list(column * l, column * novo){
+    column *p;
+
+	if(l == NULL){
+        l = novo;
+        l->n++;
+    }
+	else{
+		for(p = l; p != NULL; p = p->next){
+			if(p->next == NULL){
+				p->next = novo;
+				novo->next = NULL;
+                l->n++;
+				break;
+			}
+		}
+	}
+    return l;
+}
+
+column * table_to_list(char nomeTabela[]){
+    struct fs_objects objeto;
+	tp_table * esquema = NULL;
+    tp_table * p = NULL;
+    column * l = NULL;
+    column * novo = NULL;
+
+    if(!verificaNomeTabela(nomeTabela)){
+        printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
+        return NULL;
+    }
+
+    objeto = leObjeto(nomeTabela);
+    esquema = leSchema(objeto);
+
+    for(p = esquema; p != NULL; p = p->next){
+        novo = (column *)malloc(sizeof(column));
+        strcpy(novo->nomeCampo, p->nome);
+        strcpy(novo->nome, nomeTabela);
+        novo->tipoCampo = p->tipo;
+        //printf("nomeCampo: %s, nome: %s, tipo: %c\n", novo->nomeCampo, novo->nome, novo->tipoCampo);
+
+        l = insert_column_list(l, novo);
+    }
+    return l;
 }
 
 void pulpfic(column * mineiro, char nomeTabela[]){
@@ -922,7 +970,9 @@ void pulpfic(column * mineiro, char nomeTabela[]){
 		}
 		else printf("\nERROR: wrong attributes or table name.\n\n\n");
 	}
-	else imprime(nomeTabela);
+	else{
+        imprime2(nomeTabela, table_to_list(nomeTabela));
+    }
 }
 
 
