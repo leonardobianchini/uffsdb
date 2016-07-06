@@ -40,8 +40,10 @@ w_token *token_list = NULL;
 void insert_token_list(w_token * nodo){
     w_token *p;
 
-	if(token_list == NULL) token_list = nodo;
-
+	if(token_list == NULL) {
+        token_list = nodo;
+        nodo->next=NULL;
+    }
 	else{
 		for(p = token_list; p != NULL; p = p->next){
 			if(p->next == NULL){

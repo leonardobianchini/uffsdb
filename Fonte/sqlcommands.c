@@ -738,6 +738,7 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
             d = (w_token *)malloc(sizeof(w_token));
             d->tipo = p->tipo;
             d->valor=(void *)malloc(sizeof(p->valor));
+            memset(d->valor,0,sizeof(p->valor));
             strcpy(d->valor, p->valor);
             d->next = NULL;
             l = insert_token(l, d);
@@ -783,19 +784,19 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
             }
 
             // Chamar a função do becker aqui
-
-/*          printf("comeca aqui\n");
+/*            w_token *ind=NULL;
+//          printf("comeca aqui\n");
             for(ind = alternaList; ind; ind = ind->next){
                 if(ind->tipo == 1)
-                    printf("ValorTuplaInt: %d\n", *(int *)ind->valor);
+                    printf("%d", *(int *)ind->valor);
                 else if(ind->tipo == 3)
-                    printf("ValorTuplaStr: %s\n", (char*)ind->valor);
+                    printf("%s", (char*)ind->valor);
                 else if(ind->tipo == 2 || ind->tipo == 10)
-                    printf("ValorTuplaDou: %lf\n", *(double *)ind->valor);
+                    printf("%lf", *(double *)ind->valor);
                 else
-                    printf("ValorTuplaOut: %s\n", (char*)ind->valor);
+                    printf("%s", (char*)ind->valor);
             }
-            printf("termina aqui\n\n");
+            printf("\n");
 */
 
 
