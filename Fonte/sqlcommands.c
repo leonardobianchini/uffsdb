@@ -584,10 +584,75 @@ void insert(rc_insert *s_insert) {
 	freeColumn(colunas);
 	freeTable(tabela);
 }
-
-
 ///////////////
 
+w_token * insert_token(w_token * l, w_token * nodo){
+    w_token *p;
+
+	if(l == NULL){
+        l = nodo;
+        nodo->next = NULL;
+    }
+	else{
+		for(p = l; p != NULL; p = p->next){
+			if(p->next == NULL){
+				p->next = nodo;
+				nodo->next = NULL;
+				break;
+			}
+		}
+	}
+    return l;
+}
+
+
+
+column * insert_column_list(column * l, column * novo){
+    column *p;
+
+	if(l == NULL){
+        l = novo;
+        novo->next=NULL;
+        l->n = 1;
+    }
+	else{
+		for(p = l; p != NULL; p = p->next){
+            if(p->next == NULL){
+				p->next = novo;
+				novo->next = NULL;
+                l->n++;
+				break;
+			}
+		}
+	}
+    return l;
+}
+
+column * table_to_list(char nomeTabela[]){
+    struct fs_objects objeto;
+	tp_table * esquema = NULL;
+    tp_table * p = NULL;
+    column * l = NULL;
+    column * novo = NULL;
+
+    if(!verificaNomeTabela(nomeTabela)){
+        printf("\nERROR: relation \"%s\" was not   found.\n\n\n", nomeTabela);
+        return NULL;
+    }
+
+    objeto = leObjeto(nomeTabela);
+    esquema = leSchema(objeto);
+
+    for(p = esquema; p != NULL; p = p->next){
+        novo = (column *)malloc(sizeof(column));
+        strcpy(novo->nomeCampo, p->nome);
+        strcpy(novo->nome, nomeTabela);
+        novo->tipoCampo = p->tipo;
+        //printf("nomeCampo: %s, nome: %s, tipo: %c\n", novo->nomeCampo, novo->nome, novo->tipoCampo);
+        l = insert_column_list(l, novo);
+    }
+    return l;
+}
 
 //	Testa se a está em b. Não exatamente isso, mas nesse sentido
 int inList(column *a, column *b){
@@ -602,13 +667,90 @@ int inList(column *a, column *b){
 }
 
 
+//  Função linda e maravilhosa que substitui os valores dos atributos no token_list
+w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
+    int flag = 0, i;
+    w_token * l = NULL;
+    w_token * p = NULL;
+    w_token * d = NULL;
+    column * c = NULL;
+    column * a = NULL;
+
+    if(token_list == NULL) return NULL;
+
+    for(p = token_list; p; p = p->next){
+        if(p->tipo == 4){   //object
+            c = table_to_list((char *)p->valor);
+            if(c == NULL) return NULL;
+
+            a = (column *)malloc(sizeof(column));
+            strcpy(a->nome, (char *)p->valor);
+            p = p->next;
+            strcpy(a->nomeCampo, (char *)p->valor);
+            a->next = NULL;
+
+            flag = inList(a, c);
+            if(flag == 0){
+                free(a);
+                printf("ERROR: erro de atributo na tabela\n");
+                return NULL;
+            }
+            else if(flag == -1){
+                free(a);
+                return NULL;
+            }
+            else{
+                d = (w_token *)malloc(sizeof(w_token));
+                for(i = 0; i < nAttr; i++){
+                    if(strcmp(a->nomeCampo, tupla[i].nomeCampo) == 0){
+                        d->valor=(void *)malloc(sizeof(tupla[i].valorCampo));
+
+                        if (tupla[i].tipoCampo=='S'){
+                            d->tipo = 3;
+                            strcpy(d->valor, tupla[i].valorCampo);
+                        }
+                        else if (tupla[i].tipoCampo=='I'){
+                            d->tipo = 1;
+                            int *n = (int *)&tupla[i].valorCampo[0];
+                            d->valor=(char *)n;
+                        }
+                        else if (tupla[i].tipoCampo=='D'){
+                            d->tipo = 2;
+                            double *nhaha = (double *)&tupla[i].valorCampo[0];
+                            d->valor=(char *)nhaha;
+                        }
+                        else if (tupla[i].tipoCampo=='C'){
+                            d->tipo = 3;
+                            char *nh = (char *)&tupla[i].valorCampo[0];
+                            d->valor=(char *)nh;
+                        }
+                    }
+                }
+                d->next = NULL;
+                l = insert_token(l, d);
+            }
+            free(a);
+        }
+        else{
+            d = (w_token *)malloc(sizeof(w_token));
+            d->tipo = p->tipo;
+            d->valor=(void *)malloc(sizeof(p->valor));
+            strcpy(d->valor, p->valor);
+            d->next = NULL;
+            l = insert_token(l, d);
+        }
+    }
+    return l;
+}
+
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list){
 	int i, num = nAttr*nTuplas, j;
 	column * p = pages;
-	column * q;
-	column * novo;
-	column * t;
+	column * q = NULL;
+	column * novo = NULL;
+	column * t = NULL;
     column * tupla = (column *)malloc(sizeof(column) * nAttr);
+    w_token * alternaList = NULL;
 
 	column * newList;
 	newList = (column *)malloc(sizeof(column));
@@ -626,6 +768,30 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
             for(j = 0; j < nAttr; j++){
                 tupla[j] = p[i+j];
             }
+            if(token_list){
+                alternaList = subs_tokens(token_list, tupla, nAttr);
+                if(alternaList == NULL){
+                    return NULL;
+                }
+            }
+
+            // Chamar a função do becker aqui
+
+/*          printf("comeca aqui\n");
+            for(ind = alternaList; ind; ind = ind->next){
+                if(ind->tipo == 1)
+                    printf("ValorTuplaInt: %d\n", *(int *)ind->valor);
+                else if(ind->tipo == 3)
+                    printf("ValorTuplaStr: %s\n", (char*)ind->valor);
+                else if(ind->tipo == 2 || ind->tipo == 10)
+                    printf("ValorTuplaDou: %lf\n", *(double *)ind->valor);
+                else
+                    printf("ValorTuplaOut: %s\n", (char*)ind->valor);
+            }
+            printf("termina aqui\n\n");
+*/
+
+
             /*
             for(j = 0; j < nAttr; j++){
                 if(tupla[j].tipoCampo == 'I')
@@ -711,7 +877,7 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
     struct fs_objects objeto;
 
     if(!verificaNomeTabela(nomeTabela)){
-        printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
+        printf("\nERROR:     relation \"%s\" was not found.\n\n\n", nomeTabela);
         return;
     }
 
@@ -740,7 +906,13 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
 
     int ntuples = --x;
 	p = 0;
-  column *pagina = NULL;
+    column *pagina = NULL;
+
+
+/*
+    if(token_list == NULL)
+        return;
+*/
 	while(x){
 	    pagina = getPage(bufferpoll, esquema, objeto, p);
 	    if(pagina == ERRO_PARAMETRO){
@@ -947,54 +1119,11 @@ int attr_in_table(column * attr, char nomeTabela[]){
 }
 
 
-column * insert_column_list(column * l, column * novo){
-    column *p;
-
-	if(l == NULL){
-        l = novo;
-        novo->next=NULL;
-        l->n = 1;
-    }
-	else{
-		for(p = l; p != NULL; p = p->next){
-            if(p->next == NULL){
-				p->next = novo;
-				novo->next = NULL;
-                l->n++;
-				break;
-			}
-		}
-	}
-    return l;
-}
-
-column * table_to_list(char nomeTabela[]){
-    struct fs_objects objeto;
-	tp_table * esquema = NULL;
-    tp_table * p = NULL;
-    column * l = NULL;
-    column * novo = NULL;
-
-    if(!verificaNomeTabela(nomeTabela)){
-        printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
-        return NULL;
-    }
-
-    objeto = leObjeto(nomeTabela);
-    esquema = leSchema(objeto);
-
-    for(p = esquema; p != NULL; p = p->next){
-        novo = (column *)malloc(sizeof(column));
-        strcpy(novo->nomeCampo, p->nome);
-        strcpy(novo->nome, nomeTabela);
-        novo->tipoCampo = p->tipo;
-        //printf("nomeCampo: %s, nome: %s, tipo: %c\n", novo->nomeCampo, novo->nome, novo->tipoCampo);
-        l = insert_column_list(l, novo);
-    }
-    return l;
-}
 
 void pulpfic(column * mineiro, char nomeTabela[], w_token * token_list){
+    column * ttl = table_to_list(nomeTabela);
+    if(ttl == NULL) return;
+
     if(mineiro != NULL){
 		if(attr_in_table(mineiro, nomeTabela) == 0){
 			imprime2(nomeTabela, mineiro, token_list);
@@ -1002,7 +1131,8 @@ void pulpfic(column * mineiro, char nomeTabela[], w_token * token_list){
 		else printf("\nERROR: wrong attributes or table name.\n\n\n");
 	}
 	else{
-        imprime2(nomeTabela, table_to_list(nomeTabela), token_list);
+
+        imprime2(nomeTabela, ttl, token_list);
     }
 }
 

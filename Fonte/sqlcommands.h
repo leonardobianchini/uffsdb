@@ -112,3 +112,7 @@ column * list_like_page(column * lista);
 column * table_to_list(char nomeTabela[]);
 
 column * insert_column_list(column * l, column * novo);
+
+w_token * insert_token(w_token * l, w_token * nodo);
+
+w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr);
