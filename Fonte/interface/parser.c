@@ -77,7 +77,7 @@ void getToken(char * token, int type){
         novo->valor = c;
     }
     else if(type == WT_VALOR){
-        int *c = malloc(sizeof(double));
+        double *c = malloc(sizeof(double));
         *c = convertD(token);
         novo->valor = c;
     }

@@ -22,6 +22,7 @@
   #include "dictionary.h"
 #endif
 
+int errinho = 0;
 /* ----------------------------------------------------------------------------------------------
     Objetivo:   Recebe o nome de uma tabela e engloba as funções leObjeto() e leSchema().
     Parametros: Nome da Tabela, Objeto da Tabela e tabela.
@@ -636,7 +637,8 @@ column * table_to_list(char nomeTabela[]){
     column * novo = NULL;
 
     if(!verificaNomeTabela(nomeTabela)){
-        printf("\nERROR: relation \"%s\" was not   found.\n\n\n", nomeTabela);
+        printf("\nERROR1: relation or atribute was not found.\n\n\n");
+        errinho = 1;
         return NULL;
     }
 
@@ -692,7 +694,8 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
             flag = inList(a, c);
             if(flag == 0){
                 free(a);
-                printf("ERROR: erro de atributo na tabela\n");
+                printf("\nERROR: erro de atributo na tabela\n\n\n");
+                errinho = 2;
                 return NULL;
             }
             else if(flag == -1){
@@ -765,12 +768,16 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
 
         if(i%nAttr == 0){
             t = &p[i];
+
+            // Para parar de dar WARNING
+            if(0)printf("%s", t->nome);
+
             for(j = 0; j < nAttr; j++){
                 tupla[j] = p[i+j];
             }
             if(token_list){
                 alternaList = subs_tokens(token_list, tupla, nAttr);
-                if(alternaList == NULL){
+                if(alternaList == NULL ){
                     return NULL;
                 }
             }
@@ -926,9 +933,13 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
 
 
         //sim é aqui mesmo, tenho certeza by:becker
-
+        errinho = 0;
 		column * selected;
 		selected = select_list(pagina, l, objeto.qtdCampos, bufferpoll[p].nrec, token_list);
+        if(token_list && selected == NULL && errinho){
+            errinho = 0;
+            return;
+        }
 
 
         column * cat;
