@@ -1385,7 +1385,7 @@ void pulpfic(column * mineiro, char nomeTabela[], w_token * token_list){
     if(ttl == NULL) return;
 
     if(mineiro != NULL){
-		if(attr_in_table(mineiro, nomeTabela) && tableName_test(token_list, nomeTabela)){
+		if(attr_in_table(mineiro, nomeTabela) == 0 && tableName_test(token_list, nomeTabela)){
             imprime2(nomeTabela, mineiro, token_list);
 		}
 		else printf("\nERROR: wrong attributes or table name.\n\n\n");
