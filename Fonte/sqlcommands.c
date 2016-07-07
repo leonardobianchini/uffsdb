@@ -766,6 +766,48 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
     return l;
 }
 
+
+int checks_where(w_token * wtlist){
+    w_token *p=NULL, *anterior=NULL;
+    int nlogics=0,nrelations, ccount=0;//cplogics = CheckpointLogic
+    w_token * relations[50];
+    w_token * cplogics[50];
+    relations[0]=wtlist;
+    
+    for(p = wtlist; p; p = p->next){
+        if (p->tipo==9){
+            cplogics[nlogics]=p;
+            nlogics++;
+            
+            if(anterior && p->next){//inb4 = apenas precaução
+                relations[nlogics]=p->next;
+                anterior->next=NULL;
+                
+            }
+            
+        }
+        ccount++;
+        anterior = p;
+    }
+    nrelations = nlogics + 1;
+    
+    int i;
+    
+    for(i=0;i<nrelations;i++){
+        if(i){
+            print_wtoken(cplogics[i-1]);
+            printf("\n");
+        }//imprime todas as operalções lógicas entre cada relação
+        
+        for (p=relations[i];p;p=p->next){
+            print_wtoken(p);//imprime todas as relações
+        }
+        printf("\n");
+    }
+    
+    return 1;
+}
+
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list){
 	int i, num = nAttr*nTuplas, j;
 	column * p = pages;
@@ -785,7 +827,7 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
 
     
     
-    
+    int rwhereflag=1;
 	for(i = 0; i < num; i++){
 
         if(i%nAttr == 0){
@@ -802,15 +844,11 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
                 if(alternaList == NULL ){
                     return NULL;
                 }
-/*                w_token *ind=NULL;
-                for(ind = alternaList; ind; ind = ind->next){
-                   print_wtoken(ind);
-                }
-                printf("\n");
-*/                
+                
+                rwhereflag = checks_where(alternaList);
             }
         }
-		if(inList(&p[i], attr)){
+		if(inList(&p[i], attr) && rwhereflag){
 			novo = (column *)malloc(sizeof(column));
 			novo->tipoCampo = p[i].tipoCampo;
 			strcpy(novo->nomeCampo, p[i].nomeCampo);
