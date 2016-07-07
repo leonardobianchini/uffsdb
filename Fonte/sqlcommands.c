@@ -587,6 +587,29 @@ void insert(rc_insert *s_insert) {
 }
 ///////////////
 
+void print_token(w_token * ind){
+    if(ind->tipo == 1)
+        printf("ValorTuplaInt: %d\n", *(int *)ind->valor);
+    else if(ind->tipo == 3)
+        printf("ValorTuplaStr: %s\n", (char*)ind->valor);
+    else if(ind->tipo == 2 || ind->tipo == 10)
+        printf("ValorTuplaDou: %lf\n", *(double *)ind->valor);
+    else
+        printf("ValorTuplaOut: %s\n", (char*)ind->valor);
+}
+
+char type_to_type(int a){
+    if(a == 1)
+        return 'I';
+    if(a == 2)
+        return 'D';
+    if(a == 3)
+        return 'S';
+    if(a == 10)
+        return 'D';
+    return '#';
+}
+
 w_token * insert_token(w_token * l, w_token * nodo){
     w_token *p;
 
@@ -629,6 +652,8 @@ column * insert_column_list(column * l, column * novo){
     return l;
 }
 
+//  Função que recebe uma string e se existir uma tabela com esse nome, retorna
+//  a lista encadeada da mesma, caso contrário, retorna NULL;
 column * table_to_list(char nomeTabela[]){
     struct fs_objects objeto;
 	tp_table * esquema = NULL;
@@ -637,26 +662,261 @@ column * table_to_list(char nomeTabela[]){
     column * novo = NULL;
 
     if(!verificaNomeTabela(nomeTabela)){
-        printf("\nERROR1: relation or atribute was not found.\n\n\n");
         errinho = 1;
         return NULL;
     }
 
     objeto = leObjeto(nomeTabela);
     esquema = leSchema(objeto);
+    if(!esquema){
+        errinho = 1;
+        return NULL;
+    }
 
     for(p = esquema; p != NULL; p = p->next){
         novo = (column *)malloc(sizeof(column));
         strcpy(novo->nomeCampo, p->nome);
         strcpy(novo->nome, nomeTabela);
         novo->tipoCampo = p->tipo;
-        //printf("nomeCampo: %s, nome: %s, tipo: %c\n", novo->nomeCampo, novo->nome, novo->tipoCampo);
         l = insert_column_list(l, novo);
     }
     return l;
 }
 
-//	Testa se a está em b. Não exatamente isso, mas nesse sentido
+//  Função que recebe 3 tokens (2 openrandos e um relacioanl) e retorna se a
+//  relação é verdadeira;
+int compara_relacional(w_token * r, w_token * rel, w_token * t2){
+    if(r->tipo == 1){
+        if(!strcmp((char *)rel->valor, "=")){
+            return *(int *)r->valor == *(int *)t2->valor;
+        }
+        else if(strcmp((char *)rel->valor, "!=") == 0){
+            return *(int *)r->valor != *(int *)t2->valor;
+        }
+        else if(strcmp((char *)rel->valor, "<=") == 0){
+            return *(int *)r->valor <= *(int *)t2->valor;
+        }
+        else if(strcmp((char *)rel->valor, ">=") == 0){
+            return *(int *)r->valor >= *(int *)t2->valor;
+        }
+        else if(!strcmp((char *)rel->valor, "<")){
+            return *(int *)r->valor < *(int *)t2->valor;
+        }
+        else if(!strcmp((char *)rel->valor, ">")){
+            return *(int *)r->valor > *(int *)t2->valor;
+        }
+    }
+    else if(r->tipo == 2){
+        if(!strcmp((char *)rel->valor, "=")){
+            return *(double *)r->valor == *(double *)t2->valor;
+        }
+        else if(strcmp((char *)rel->valor, "!=") == 0){
+            return *(double *)r->valor != *(double *)t2->valor;
+        }
+        else if(strcmp((char *)rel->valor, "<=") == 0){
+            return *(double *)r->valor <= *(double *)t2->valor;
+        }
+        else if(strcmp((char *)rel->valor, ">=") == 0){
+            return *(double *)r->valor >= *(double *)t2->valor;
+        }
+        else if(!strcmp((char *)rel->valor, "<")){
+            return *(double *)r->valor < *(double *)t2->valor;
+        }
+        else if(!strcmp((char *)rel->valor, ">")){
+            return *(double *)r->valor > *(double *)t2->valor;
+        }
+    }
+    else if(r->tipo == 3){
+        char * string1 = (char *)r->valor;
+        char * string2 = (char *)t2->valor;
+
+        if(string1[strlen(string1) - 1] == '\''){
+            string1[strlen(string1) - 1] = '\0';
+            string1 = &string1[1];
+        }
+        if(string2[strlen(string2) - 1] == '\''){
+            string2[strlen(string2) - 1] = '\0';
+            string2 = &string2[1];
+        }
+
+        if(strcmp((char *)rel->valor, "=") == 0){
+            return !(strcmp(string1, string2));
+        }
+        else if(strcmp((char *)rel->valor, "!=") == 0){
+            return strcmp(string1, string2) != 0;
+        }
+        else if(!strcmp((char *)rel->valor, "<")){
+            return strcmp(string1, string2) < 0;
+        }
+        else if(!strcmp((char *)rel->valor, ">")){
+            return strcmp(string1, string2) > 0;
+        }
+        else if(strcmp((char *)rel->valor, "<=") == 0){
+            return strcmp(string1, string2) <= 0;
+        }
+        else if(strcmp((char *)rel->valor, ">=") == 0){
+            return strcmp(string1, string2) >= 0;
+        }
+        else
+            return 0;
+    }
+    return -1;
+}
+
+int remove_aritmetico(w_token* l){
+    w_token * p;
+    w_token * t1 = NULL; // numero1
+    w_token * t2 = NULL; // numero2
+    w_token * t3 = NULL; // operação
+    w_token * r = NULL; //
+    w_token * rel = NULL; //
+    w_token * novo = NULL;
+
+    double a = 0, b = 0;
+    int flag = -1, resp = 0;
+    int n1 = -1;
+
+    for(p = l; p; p = p->next){
+        if(p->tipo == 5 || p->tipo == 6 || p->tipo == 7)
+            t3 = p;
+        else if(p->tipo == 8){
+            rel = p;
+            r = t2;
+            t1 = NULL;
+            t2 = NULL;
+        }
+        else if(p->tipo == 9){
+            resp = compara_relacional(r, rel, t2);
+            if(n1 == -1)
+                n1 = resp;
+            else{
+                if(flag == 0)
+                    n1 = n1 || resp;
+                else if(flag == 1)
+                    n1 = n1 && resp;
+            }
+
+            if(strlen((char *)(p->valor)) == 2)
+                flag = 0;
+            else
+                flag = 1;
+
+            t1 = NULL;
+            t2 = NULL;
+            t3 = NULL;
+        }
+        else if (p->tipo == 1 || p->tipo == 2){
+            t1 = t2;
+            t2 = p;
+            if(t1 != NULL){
+                if(t1->tipo == t2->tipo){
+                    novo = (w_token *)malloc(sizeof(w_token));
+                    novo->tipo = t1->tipo;
+                    novo->valor=(void *)malloc(sizeof(t1->valor));
+                    memset(novo->valor,0,sizeof(t1->valor));
+
+                    if(*(char *)t3->valor == '+'){
+                        if(t1->tipo == 1){
+                            a = *(int *)t1->valor;
+                            b = *(int *)t2->valor;
+                            int *c = malloc(sizeof(int));
+                            *c = (a+b);
+                            novo->valor=c;
+                        }
+                        else if(t1->tipo == 2){
+                            a = *(double *)t1->valor;
+                            b = *(double *)t2->valor;
+                            double *c = malloc(sizeof(double));
+                            *c = (a+b);
+                            novo->valor=c;
+                        }
+                        t1 = NULL;
+                        t2 = novo;
+                    }
+                    else if(*(char *)t3->valor == '-'){
+                        if(t1->tipo == 1){
+                            a = *(int *)t1->valor;
+                            b = *(int *)t2->valor;
+                            int *c = malloc(sizeof(int));
+                            *c = (a-b);
+                            novo->valor=c;
+                        }
+                        else if(t1->tipo == 2){
+                            a = *(double *)t1->valor;
+                            b = *(double *)t2->valor;
+                            double *c = malloc(sizeof(double));
+                            *c = (a-b);
+                            novo->valor=c;
+                        }
+                        t1 = NULL;
+                        t2 = novo;
+                    }
+                    else if(*(char *)t3->valor == '*'){
+                        if(t1->tipo == 1){
+                            a = *(int *)t1->valor;
+                            b = *(int *)t2->valor;
+                            int *c = malloc(sizeof(int));
+                            *c = (a*b);
+                            novo->valor=c;
+                        }
+                        else if(t1->tipo == 2){
+                            a = *(double *)t1->valor;
+                            b = *(double *)t2->valor;
+                            double *c = malloc(sizeof(double));
+                            *c = (a*b);
+                            novo->valor=c;
+                        }
+                        t1 = NULL;
+                        t2 = novo;
+                    }
+                    else if(*(char *)t3->valor == '/'){
+                        if(t1->tipo == 1){
+                            a = *(int *)t1->valor;
+                            b = *(int *)t2->valor;
+                            int *c = malloc(sizeof(int));
+                            *c = (a/b);
+                            novo->valor=c;
+                        }
+                        else if(t1->tipo == 2){
+                            a = *(double *)t1->valor;
+                            b = *(double *)t2->valor;
+                            double *c = malloc(sizeof(double));
+                            *c = (a/b);
+                            novo->valor=c;
+                        }
+                        t1 = NULL;
+                        t2 = novo;
+                    }
+                }
+                else return -1;
+            }
+        }
+        else if (p->tipo == 3){
+            t1 = t2;
+            t2 = p;
+        }
+    }
+    resp = compara_relacional(r, rel, t2);
+
+    if (flag == -1)
+        return resp;
+
+    if(n1 == -1)
+        n1 = resp;
+    else{
+        if(flag == 0)
+            n1 = n1 || resp;
+        else if(flag == 1)
+            n1 = n1 && resp;
+    }
+    return n1;
+}
+
+int verify_where(w_token* tklist){
+    return remove_aritmetico(tklist);
+}
+
+//	Testa se o atributo nomeCampo do nodo a é igual a algum dos nodos da lista b
 int inList(column *a, column *b){
 	column *p;
 
@@ -668,22 +928,9 @@ int inList(column *a, column *b){
 	return 0;
 }
 
-void print_wtoken(w_token* a){
-    if(a){
-        if(a->tipo == 1)
-            printf("%d", *(int *)a->valor);
-        else if(a->tipo == 3)
-            printf("%s", (char*)a->valor);
-        else if(a->tipo == 2 || a->tipo == 10)
-            printf("%lf", *(double *)a->valor);
-        else if(a->tipo == 11 || a->tipo == 12)
-            printf("%c",*(char *)a->valor);
-        else
-            printf("%s", (char*)a->valor);
-    }
-}
 
-//  Função linda e maravilhosa que substitui os valores dos atributos no token_list
+//  Função que substitui atributos por valores na lista de tokens e retorna
+//  a nova lista
 w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
     int flag = 0, i;
     w_token * l = NULL;
@@ -695,7 +942,7 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
     if(token_list == NULL) return NULL;
 
     for(p = token_list; p; p = p->next){
-        if(p->tipo == 4){   //object
+        if(p->tipo == 4){
             c = table_to_list((char *)p->valor);
             if(c == NULL) return NULL;
 
@@ -754,12 +1001,13 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
             if(p->tipo==3){
                 d->valor=(void *)malloc(strlen(p->valor));
                 strcpy(d->valor, p->valor);
-            }else{
-                d->valor=(void *)malloc(sizeof(p->valor));
-                memset(d->valor,0,sizeof(p->valor));
-                memcpy(d->valor, p->valor, sizeof(void *));
-
             }
+            else{
+                d->valor = (void *)malloc(sizeof(p->valor));
+                memset(d->valor, 0, sizeof(p->valor));
+                memcpy(d->valor, p->valor, sizeof(void *));
+             }
+
 
             d->next = NULL;
             l = insert_token(l, d);
@@ -768,167 +1016,8 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
     return l;
 }
 
-
-int verify_exp_types(w_token * aexp){
-    int hist=0;//1=Númerico, 2=String, 0=Erro imediato
-    w_token *p;
-    for(p=aexp;p;p=p->next){
-        if(p->tipo == 4 || p->tipo == 8 || p->tipo == 9){//4=objeto, 5=relacional, 9=logico
-            return 0;
-        }else if(p->tipo == 3){//tipo alphanumerico, vai pra string
-            if(hist == 1){
-                return 0;
-            }
-            hist=2;//seta historico como grupo string
-        }else if (p->tipo == 1 || p->tipo == 2 || p->tipo == 5 || p->tipo == 6 || p->tipo == 7 || p->tipo == 10){
-            //1 = numero, 2 = valor, 5 = sinal, 6 = aritimetic, 7 = asterisco, 10 = value
-            if(hist == 2){
-                return 0;
-            }
-            hist=1;//seta tipo historico como numerico
-        }
-        
-    }
-    return hist;
-}
-
-
-int string_relation(w_token * lstr, w_token * rstr, char *op){//return 1 true, 0 false e -1 para erro
-    w_token * p;
-    char *esquerda=NULL, *direita=NULL;
-    int strresult=0;
-    
-    for(p=lstr ; p ; p=p->next){
-        if(p->tipo==3){
-            esquerda=p->valor;
-        }
-    }
-    
-    for(p=rstr ; p ; p=p->next){
-        if(p->tipo==3){
-            direita=p->valor;
-        }
-    }
-    
-    strresult=strcmp(esquerda,direita);
-//    printf("Comparando se %s %s %s",esquerda,op,direita);
-    if(!strcmp(op,"=")){
-        if(strresult == 0) return 1;
-        else return 0;
-    }else if(!strcmp(op,"!=")){
-        if(strresult != 0) return 1;
-        else return 0;
-    }else if(!strcmp(op,">")){
-        if(strresult > 0) return 1;
-        else return 0;
-    }else if(!strcmp(op,"<")){
-        if(strresult < 0) return 1;
-        else return 0;
-    }else if(!strcmp(op,">=")){
-        if(strresult >= 0) return 1;
-        else return 0;
-    }else if(!strcmp(op,"<=")){
-        if(strresult <= 0) return 1;
-        else return 0;
-    }else{
-        printf("ERRO: Operação não reconhecida perto de %s\n",op );
-        return -1;
-    }
-    
-    return 1;
-}
-
-int solve_relation(w_token * relation){//return true 1, return false 0, return -1 erro
-    w_token *p, *oprelation, *anterior=NULL, *leftxp, *rightxp=NULL;
-    leftxp=relation;
-    for(p=relation ; p ; p=p->next){
-        if (p->tipo == 8){//é operador relacional =, !=, <, >, <=, >=
-            oprelation=p;
-            
-            if (anterior && p->next){
-                anterior->next=NULL;
-                rightxp=p->next;
-            }
-            
-        }
-        anterior=p;
-    }
-    int boolleft=verify_exp_types(leftxp), boolright=verify_exp_types(rightxp);
-    /*
-    printf("Left:");for(p=leftxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",boolleft);
-    printf("\nOperação:");print_wtoken(oprelation);
-    printf("\nRight:");for(p=rightxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",boolright);
-    */
-    if( (boolleft && boolright)  && boolleft == boolright  ){//if true all ok
-        
-        
-    }else{//algum erro aconteceu
-        printf("ERRO: tipos imcompativeis perto de:");
-        for(p=leftxp;p;p=p->next)print_wtoken(p);
-        print_wtoken(oprelation);
-        for(p=rightxp;p;p=p->next)print_wtoken(p);
-        return -1;
-    }
-    
-    if(boolleft == 2 && boolright == 2){//faz comparaçao de duas strings
-        return string_relation(leftxp, rightxp,(char *) oprelation->valor);
-        
-    }else if(boolleft == 1 && boolright == 1){//faz comparaçao de dois númericos
-        
-        
-    }
-    
-    return 1;//                                                                 PRECISA SUBSTITUIR
-}
-
-
-int checks_where(w_token * wtlist){//return true 1, return false 0, return error -1
-    w_token *p=NULL, *anterior=NULL;
-    int nlogics=0,nrelations, ccount=0, boolrelations[50], i;//cplogics = CheckpointLogic
-    w_token * relations[50];
-    w_token * cplogics[50];
-    relations[0]=wtlist;
-    
-    for(p = wtlist; p; p = p->next){
-        if (p->tipo==9){
-            cplogics[nlogics]=p;
-            nlogics++;
-            
-            if(anterior && p->next){//inb4 = apenas precaução
-                relations[nlogics]=p->next;
-                anterior->next=NULL;
-                
-            }
-            
-        }
-        ccount++;
-        anterior = p;
-    }
-    nrelations = nlogics + 1;
-    
-    
-    for(i=0;i<nrelations;i++){
-        if(i){
-//            print_wtoken(cplogics[i-1]);
-//            printf("\n");
-        }//imprime todas as operalções lógicas entre cada relação
-        
-        for (p=relations[i];p;p=p->next){
-//            print_wtoken(p);//imprime todas as relações
-        }
-        boolrelations[i]=solve_relation(relations[i]);
-        if(boolrelations[i] == -1){
-            return -1;
-        }
-        
-//        printf("\n");
-    }
-    
-    return 1;//                                                                 PRECISA SUBSTITUIR
-}
-
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list){
-	int i, num = nAttr*nTuplas, j;
+	int i, num = nAttr * nTuplas, j, whereflag = 1;
 	column * p = pages;
 	column * q = NULL;
 	column * novo = NULL;
@@ -944,11 +1033,7 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
 	if(pages == NULL)
 		return NULL;
 
-    
-    
-    int rwhereflag=1;
 	for(i = 0; i < num; i++){
-
         if(i%nAttr == 0){
             t = &p[i];
 
@@ -963,14 +1048,15 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
                 if(alternaList == NULL ){
                     return NULL;
                 }
-                
-                rwhereflag = checks_where(alternaList);
-                if(rwhereflag == -1){
+                whereflag = verify_where(alternaList);
+                if(whereflag < 0){
+                    errinho = 1;
                     return NULL;
                 }
             }
         }
-		if(inList(&p[i], attr) && rwhereflag){
+
+		if(inList(&p[i], attr) &&  whereflag){
 			novo = (column *)malloc(sizeof(column));
 			novo->tipoCampo = p[i].tipoCampo;
 			strcpy(novo->nomeCampo, p[i].nomeCampo);
@@ -994,7 +1080,6 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
 			novo->next = NULL;
 			novo->n = 0;
 
-
 			if(newList->n == 0){
 				newList = novo;
 				novo = NULL;
@@ -1012,6 +1097,7 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
 			}
 		}
 	}
+    if(!newList->n) return NULL;
 	return newList;
 }
 
@@ -1037,12 +1123,12 @@ column * list_like_page(column * lista){
 }
 
 void imprime2(char nomeTabela[], column * l, w_token * token_list) {
-
+    int numeroTuplas = 0;
     int j,erro, x, p, cont=0;
     struct fs_objects objeto;
 
     if(!verificaNomeTabela(nomeTabela)){
-        printf("\nERROR:     relation \"%s\" was not found.\n\n\n", nomeTabela);
+        printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
         return;
     }
 
@@ -1051,7 +1137,7 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
     tp_table *esquema = leSchema(objeto);
 
     if(esquema == ERRO_ABRIR_ESQUEMA){
-        printf("ERROR: schema cannot be created.\n");
+        printf("\nERROR: schema cannot be created.\n");
         free(esquema);
         return;
     }
@@ -1069,15 +1155,10 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
     for(x = 0; erro == SUCCESS; x++)
         erro = colocaTuplaBuffer(bufferpoll, x, esquema, objeto);
 
-    int ntuples = --x;
+    x--;
 	p = 0;
     column *pagina = NULL;
 
-
-/*
-    if(token_list == NULL)
-        return;
-*/
 	while(x){
 	    pagina = getPage(bufferpoll, esquema, objeto, p);
 	    if(pagina == ERRO_PARAMETRO){
@@ -1086,11 +1167,7 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
             free(esquema);
             return;
 	    }
-        //aqui faz o where
-//        printf ("\nntuples= %d, objeto.qtdCampos= %d, bufferpoll[p].nrec= %d\n",ntuples, objeto.qtdCampos,bufferpoll[p].nrec );
 
-
-        //sim é aqui mesmo, tenho certeza by:becker
         errinho = 0;
 		column * selected;
 		selected = select_list(pagina, l, objeto.qtdCampos, bufferpoll[p].nrec, token_list);
@@ -1130,6 +1207,7 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
 	    }
 	    cont++;
         j=0;
+
 		for(cat = selected; cat; cat = cat->next){
         	if(cat->tipoCampo == 'S')
             	printf(" %-20s ", cat->valorCampo);
@@ -1145,8 +1223,10 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
     	        printf(" %-10f ", *n);
         	}
 
-            if((j+1) % l->n == 0)
+            if((j+1) % l->n == 0){
             	printf("\n");
+                numeroTuplas++;
+            }
         	else
         		printf("|");
             j++;
@@ -1163,7 +1243,7 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
 			q = a;
 		}
     }
-    printf("\n(%d %s)\n\n",ntuples,(1>=ntuples)?"row": "rows");
+    printf("\n(%d %s)\n\n",numeroTuplas,(1>=numeroTuplas)?"row": "rows");
 
     free(bufferpoll);
     free(esquema);
@@ -1257,6 +1337,18 @@ void imprime(char nomeTabela[]) {
     free(esquema);
 }
 
+int tableName_test(w_token * token_list, char nomeTabela[]){
+    w_token * p = NULL;
+
+    for(p = token_list; p; p = p->next){
+        if(p->tipo == 4){
+            if(strcmp(nomeTabela, (char *)p->valor) != 0)
+                return 0;
+            p = p->next;
+        }
+    }
+    return 1;
+}
 
 int attr_in_table(column * attr, char nomeTabela[]){
 	struct fs_objects objeto;
@@ -1265,26 +1357,25 @@ int attr_in_table(column * attr, char nomeTabela[]){
 	column * q;
 	int f = 0;
 
-  if(!verificaNomeTabela(nomeTabela)){
+    if(!verificaNomeTabela(nomeTabela)){
       printf("\nERROR: relation \"%s\" was not found.\n\n\n", nomeTabela);
       return -1;
-  }
+    }
 
-  objeto = leObjeto(nomeTabela);
-  esquema = leSchema(objeto);
+    objeto = leObjeto(nomeTabela);
+    esquema = leSchema(objeto);
 
-	for(q = attr; q != NULL; q = q->next){
+    for(q = attr; q != NULL; q = q->next){
         f = 0;
         for(p = esquema; p != NULL; p = p->next){
-			if(strcmp(q->nomeCampo, p->nome) == 0 && strcmp(nomeTabela, q->nome) == 0){
-				f = 1;
-				break;
-			}
+    		if(strcmp(q->nomeCampo, p->nome) == 0 && strcmp(nomeTabela, q->nome) == 0){
+    			f = 1;
+    			break;
+    		}
     	}
         if(f == 0) return -1;
-	}
-
-  return 0;
+    }
+    return 0;
 }
 
 
@@ -1294,14 +1385,16 @@ void pulpfic(column * mineiro, char nomeTabela[], w_token * token_list){
     if(ttl == NULL) return;
 
     if(mineiro != NULL){
-		if(attr_in_table(mineiro, nomeTabela) == 0){
-			imprime2(nomeTabela, mineiro, token_list);
+		if(attr_in_table(mineiro, nomeTabela) && tableName_test(token_list, nomeTabela)){
+            imprime2(nomeTabela, mineiro, token_list);
 		}
 		else printf("\nERROR: wrong attributes or table name.\n\n\n");
 	}
 	else{
-
-        imprime2(nomeTabela, ttl, token_list);
+        if(tableName_test(token_list, nomeTabela)){
+            imprime2(nomeTabela, ttl, token_list);
+        }
+        else printf("\nERROR: wrong attributes or table name.\n\n\n");
     }
 }
 

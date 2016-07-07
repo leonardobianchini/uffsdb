@@ -103,14 +103,6 @@ int verifyFK(char *, char *);
 
 void imprime2(char nomeTabela[], column * l, w_token * token_list);
 
-void print_wtoken(w_token* a);//função para debug
-
-int string_relation(w_token * lstr, w_token * rstr, char *op);// resolve relação entre duas string return 1 true, 0 false e -1 para erro
-
-int solve_relation(w_token * relation);//função que resolve uma relação, return true 1, return false 0, return erro-1 
-
-int checks_where(w_token * wtlist);//função que sepera listas de relações e operador lógico, return true 1, return false 0, return error -1
-
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list);
 
 int inList(column *a, column *b);
@@ -119,8 +111,20 @@ column * list_like_page(column * lista);
 
 column * table_to_list(char nomeTabela[]);
 
+int verify_where(w_token* tklist);
+
 column * insert_column_list(column * l, column * novo);
 
 w_token * insert_token(w_token * l, w_token * nodo);
 
 w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr);
+
+int remove_aritmetico(w_token* l);
+
+char type_to_type(int a);
+
+void print_token(w_token * ind);
+
+int compara_relacional(w_token * r, w_token * rel, w_token * t2);
+
+int tableName_test(w_token * token_list, char nomeTabela[]);

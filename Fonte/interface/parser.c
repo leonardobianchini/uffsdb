@@ -82,10 +82,6 @@ void getToken(char * token, int type){
         double *c = malloc(sizeof(double));
         *c = convertD(token);
         novo->valor = c;
-    }else if(type == WT_ALPHANUM){
-        token[strlen(token)-1]='\0';//remove a ultima aspa
-        novo->valor=(void *)malloc(strlen(token));
-        strcpy(novo->valor,&token[1]);//remove a primeira aspa
     }
     else{
         novo->valor=(void *)malloc(strlen(token));
@@ -93,7 +89,6 @@ void getToken(char * token, int type){
     }
     insert_token_list(novo);
     novo = NULL;
-
 }
 
 
