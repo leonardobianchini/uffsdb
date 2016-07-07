@@ -105,9 +105,9 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list);
 
 void print_wtoken(w_token* a);//função para debug
 
-int solve_relation(w_token * relation);//função que resolve uma relação
+int solve_relation(w_token * relation);//função que resolve uma relação, return true 1, return false 0, return erro-1 
 
-int checks_where(w_token * wtlist);//função que sepera listas de relações e operador lógico
+int checks_where(w_token * wtlist);//função que sepera listas de relações e operador lógico, return true 1, return false 0, return error -1
 
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list);
 

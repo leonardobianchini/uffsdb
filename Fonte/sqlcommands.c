@@ -792,7 +792,7 @@ int verify_exp_types(w_token * aexp){
     return hist;
 }
 
-int solve_relation(w_token * relation){
+int solve_relation(w_token * relation){//return true 1, return false 0, return -1 erro
     w_token *p, *oprelation, *anterior=NULL, *leftxp, *rightxp=NULL;
     leftxp=relation;
     for(p=relation ; p ; p=p->next){
@@ -807,17 +807,28 @@ int solve_relation(w_token * relation){
         }
         anterior=p;
     }
-    printf("Left:");for(p=leftxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",verify_exp_types(leftxp));
+    int boolleft=verify_exp_types(leftxp), boolright=verify_exp_types(rightxp);
+    /*
+    printf("Left:");for(p=leftxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",boolleft);
     printf("\nOperação:");print_wtoken(oprelation);
-    printf("\nRight:");for(p=rightxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",verify_exp_types(rightxp));
-    
-    //lembrete, precisar fazer uso decente da função: verify_exp_types
+    printf("\nRight:");for(p=rightxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",boolright);
+    */
+    if( (boolleft && boolright)  && boolleft == boolright  ){//if true all ok
+        
+        
+    }else{//algum erro aconteceu
+        printf("ERRO: tipos imcompativeis perto de:");
+        for(p=leftxp;p;p=p->next)print_wtoken(p);
+        print_wtoken(oprelation);
+        for(p=rightxp;p;p=p->next)print_wtoken(p);
+        return -1;
+    }
     
     return 1;//                                                                 PRECISA SUBSTITUIR
 }
 
 
-int checks_where(w_token * wtlist){
+int checks_where(w_token * wtlist){//return true 1, return false 0, return error -1
     w_token *p=NULL, *anterior=NULL;
     int nlogics=0,nrelations, ccount=0, boolrelations[50], i;//cplogics = CheckpointLogic
     w_token * relations[50];
@@ -844,16 +855,19 @@ int checks_where(w_token * wtlist){
     
     for(i=0;i<nrelations;i++){
         if(i){
-            print_wtoken(cplogics[i-1]);
-            printf("\n");
+//            print_wtoken(cplogics[i-1]);
+//            printf("\n");
         }//imprime todas as operalções lógicas entre cada relação
         
         for (p=relations[i];p;p=p->next){
 //            print_wtoken(p);//imprime todas as relações
         }
         boolrelations[i]=solve_relation(relations[i]);
+        if(boolrelations[i] == -1){
+            return -1;
+        }
         
-        printf("\n");
+//        printf("\n");
     }
     
     return 1;//                                                                 PRECISA SUBSTITUIR
@@ -897,6 +911,9 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
                 }
                 
                 rwhereflag = checks_where(alternaList);
+                if(rwhereflag == -1){
+                    return NULL;
+                }
             }
         }
 		if(inList(&p[i], attr) && rwhereflag){
