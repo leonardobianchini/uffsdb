@@ -757,7 +757,7 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
             }else{
                 d->valor=(void *)malloc(sizeof(p->valor));
                 memset(d->valor,0,sizeof(p->valor));
-                memcpy(d->valor, p->valor, sizeof(p->valor));
+                memcpy(d->valor, p->valor, sizeof(void *));
 
             }
 
@@ -792,6 +792,52 @@ int verify_exp_types(w_token * aexp){
     return hist;
 }
 
+
+int string_relation(w_token * lstr, w_token * rstr, char *op){//return 1 true, 0 false e -1 para erro
+    w_token * p;
+    char *esquerda=NULL, *direita=NULL;
+    int strresult=0;
+    
+    for(p=lstr ; p ; p=p->next){
+        if(p->tipo==3){
+            esquerda=p->valor;
+        }
+    }
+    
+    for(p=rstr ; p ; p=p->next){
+        if(p->tipo==3){
+            direita=p->valor;
+        }
+    }
+    
+    strresult=strcmp(esquerda,direita);
+//    printf("Comparando se %s %s %s",esquerda,op,direita);
+    if(!strcmp(op,"=")){
+        if(strresult == 0) return 1;
+        else return 0;
+    }else if(!strcmp(op,"!=")){
+        if(strresult != 0) return 1;
+        else return 0;
+    }else if(!strcmp(op,">")){
+        if(strresult > 0) return 1;
+        else return 0;
+    }else if(!strcmp(op,"<")){
+        if(strresult < 0) return 1;
+        else return 0;
+    }else if(!strcmp(op,">=")){
+        if(strresult >= 0) return 1;
+        else return 0;
+    }else if(!strcmp(op,"<=")){
+        if(strresult <= 0) return 1;
+        else return 0;
+    }else{
+        printf("ERRO: Operação não reconhecida perto de %s\n",op );
+        return -1;
+    }
+    
+    return 1;
+}
+
 int solve_relation(w_token * relation){//return true 1, return false 0, return -1 erro
     w_token *p, *oprelation, *anterior=NULL, *leftxp, *rightxp=NULL;
     leftxp=relation;
@@ -822,6 +868,14 @@ int solve_relation(w_token * relation){//return true 1, return false 0, return -
         print_wtoken(oprelation);
         for(p=rightxp;p;p=p->next)print_wtoken(p);
         return -1;
+    }
+    
+    if(boolleft == 2 && boolright == 2){//faz comparaçao de duas strings
+        return string_relation(leftxp, rightxp,(char *) oprelation->valor);
+        
+    }else if(boolleft == 1 && boolright == 1){//faz comparaçao de dois númericos
+        
+        
     }
     
     return 1;//                                                                 PRECISA SUBSTITUIR
