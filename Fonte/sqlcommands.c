@@ -676,6 +676,8 @@ void print_wtoken(w_token* a){
             printf("%s", (char*)a->valor);
         else if(a->tipo == 2 || a->tipo == 10)
             printf("%lf", *(double *)a->valor);
+        else if(a->tipo == 11 || a->tipo == 12)
+            printf("%c",*(char *)a->valor);
         else
             printf("%s", (char*)a->valor);
     }
@@ -767,9 +769,57 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
 }
 
 
+int verify_exp_types(w_token * aexp){
+    int hist=0;//1=Númerico, 2=String, 0=Erro imediato
+    w_token *p;
+    for(p=aexp;p;p=p->next){
+        if(p->tipo == 4 || p->tipo == 8 || p->tipo == 9){//4=objeto, 5=relacional, 9=logico
+            return 0;
+        }else if(p->tipo == 3){//tipo alphanumerico, vai pra string
+            if(hist == 1){
+                return 0;
+            }
+            hist=2;//seta historico como grupo string
+        }else if (p->tipo == 1 || p->tipo == 2 || p->tipo == 5 || p->tipo == 6 || p->tipo == 7 || p->tipo == 10){
+            //1 = numero, 2 = valor, 5 = sinal, 6 = aritimetic, 7 = asterisco, 10 = value
+            if(hist == 2){
+                return 0;
+            }
+            hist=1;//seta tipo historico como numerico
+        }
+        
+    }
+    return hist;
+}
+
+int solve_relation(w_token * relation){
+    w_token *p, *oprelation, *anterior=NULL, *leftxp, *rightxp=NULL;
+    leftxp=relation;
+    for(p=relation ; p ; p=p->next){
+        if (p->tipo == 8){//é operador relacional =, !=, <, >, <=, >=
+            oprelation=p;
+            
+            if (anterior && p->next){
+                anterior->next=NULL;
+                rightxp=p->next;
+            }
+            
+        }
+        anterior=p;
+    }
+    printf("Left:");for(p=leftxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",verify_exp_types(leftxp));
+    printf("\nOperação:");print_wtoken(oprelation);
+    printf("\nRight:");for(p=rightxp;p;p=p->next)print_wtoken(p);printf("        do tipo=%d",verify_exp_types(rightxp));
+    
+    //lembrete, precisar fazer uso decente da função: verify_exp_types
+    
+    return 1;//                                                                 PRECISA SUBSTITUIR
+}
+
+
 int checks_where(w_token * wtlist){
     w_token *p=NULL, *anterior=NULL;
-    int nlogics=0,nrelations, ccount=0;//cplogics = CheckpointLogic
+    int nlogics=0,nrelations, ccount=0, boolrelations[50], i;//cplogics = CheckpointLogic
     w_token * relations[50];
     w_token * cplogics[50];
     relations[0]=wtlist;
@@ -791,7 +841,6 @@ int checks_where(w_token * wtlist){
     }
     nrelations = nlogics + 1;
     
-    int i;
     
     for(i=0;i<nrelations;i++){
         if(i){
@@ -800,12 +849,14 @@ int checks_where(w_token * wtlist){
         }//imprime todas as operalções lógicas entre cada relação
         
         for (p=relations[i];p;p=p->next){
-            print_wtoken(p);//imprime todas as relações
+//            print_wtoken(p);//imprime todas as relações
         }
+        boolrelations[i]=solve_relation(relations[i]);
+        
         printf("\n");
     }
     
-    return 1;
+    return 1;//                                                                 PRECISA SUBSTITUIR
 }
 
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list){
