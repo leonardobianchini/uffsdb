@@ -1101,6 +1101,7 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
 	return newList;
 }
 
+//  Converte uma lista de column para vetor de column
 column * list_like_page(column * lista){
 	int i = 0;
 	column * p;
@@ -1124,7 +1125,7 @@ column * list_like_page(column * lista){
 
 void imprime2(char nomeTabela[], column * l, w_token * token_list) {
     int numeroTuplas = 0;
-    int j,erro, x, p, cont=0;
+    int j,erro, x, p, cont=0, m = 0;
     struct fs_objects objeto;
 
     if(!verificaNomeTabela(nomeTabela)){
@@ -1176,11 +1177,11 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
             return;
         }
 
-
         column * cat;
         int pdpano = 0;
 	    if(!cont) {
 	        for(cat = selected ; cat; cat = cat->next){
+                m = 1;
 	            if(cat->tipoCampo == 'S')
 	                printf(" %-20s ", cat->nomeCampo);
 	        	else
@@ -1206,6 +1207,7 @@ void imprime2(char nomeTabela[], column * l, w_token * token_list) {
 	        printf("\n");
 	    }
 	    cont++;
+        if(!m) cont = 0;
         j=0;
 
 		for(cat = selected; cat; cat = cat->next){
@@ -1379,7 +1381,7 @@ int attr_in_table(column * attr, char nomeTabela[]){
 }
 
 
-
+//
 void pulpfic(column * mineiro, char nomeTabela[], w_token * token_list){
     column * ttl = table_to_list(nomeTabela);
     if(ttl == NULL) return;

@@ -92,9 +92,11 @@ union c_int{
     char cnum[sizeof(int)];
 };
 
+
+//  Estrutura para guardar tokens
 typedef struct w_token {
-    int         tipo;
-    void *      valor;
+    int         tipo;       //  Tipo do token
+    void *      valor;      //  Valor do token
     struct w_token * next;
 }w_token;
 

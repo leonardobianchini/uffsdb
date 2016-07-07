@@ -32,11 +32,13 @@ rc_parser GLOBAL_PARSER;
 
 
 
+//  Listas globais que guardam os tokens
+column *select_attributes = NULL;           //  Lista de atributos do select
+column *select_attribute = NULL;            //  Nodo global para auxiliar
+w_token *token_list = NULL;                 //  Lista de tokens do where
 
-column *select_attributes = NULL;
-column *select_attribute = NULL;
-w_token *token_list = NULL;
-
+//  Função de inserção na lista global de tokens
+//  insert tipo push
 void insert_token_list(w_token * nodo){
     w_token *p;
 
@@ -55,7 +57,7 @@ void insert_token_list(w_token * nodo){
 	}
 }
 
-
+//  Função que guarda os tokens reconhecidos pelo yacc/lex
 void getToken(char * token, int type){
     w_token *novo;
     novo = (w_token *)malloc(sizeof(w_token));
@@ -91,7 +93,7 @@ void getToken(char * token, int type){
     novo = NULL;
 }
 
-
+//  Zera a lista a cada pesquisa
 void null_list(){
     w_token *p;
     w_token *a;

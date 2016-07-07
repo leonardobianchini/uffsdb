@@ -1,3 +1,8 @@
+# alunos
+1411100040 - João Carlos Becker
+1411100015 - Leonardo Bianchini
+1411100022 - Marco Aurélio Alves Puton
+
 # uffsdb
 A simple teaching DBMS
 
@@ -6,7 +11,7 @@ A simple teaching DBMS
 
 # how to execute
  `uffsdb/Fonte/./uffsdb`
- 
+
 # compiler
  uffsdb commands are interpreted using `yacc` and `lex`.
  In the `interface` folder type `make` to compile both.

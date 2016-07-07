@@ -101,30 +101,46 @@ int verifyFieldName(char **, int );
 ////
 int verifyFK(char *, char *);
 
+
+//  Função adaptada para fazer seleção das tuplas do banco
 void imprime2(char nomeTabela[], column * l, w_token * token_list);
 
+//  Recebe uma pagina e retorna uma lista com as colunas selecionadas
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list);
 
+//  Verifica se o identificador de a está em b
 int inList(column *a, column *b);
 
+//  Converte uma lista de colunas em um vetor de colunas
 column * list_like_page(column * lista);
 
+//  Converte um vetor de colunas em uma lista de colunas
 column * table_to_list(char nomeTabela[]);
 
+//  Retorna verdadeiro quando satisfaz a cláusula where
 int verify_where(w_token* tklist);
 
+//  Insere um nodo na lista de colunas
 column * insert_column_list(column * l, column * novo);
 
+//  Insere um nodo na lista de tokens
 w_token * insert_token(w_token * l, w_token * nodo);
 
+//  Quando encontrado valor do tipo objeto faz a troca com o valor referenciado
+//  na população do banco e aloca espaço para o conteúdo que está na cláusula where
 w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr);
 
+//  Retorna verdadeiro quando satisfaz a cláusula where
 int remove_aritmetico(w_token* l);
 
+//  Converte tipo de token para tipo de coluna
 char type_to_type(int a);
 
+//  Imprime o valor do token
 void print_token(w_token * ind);
 
+//  Recebe dois operandos e um relacional e retorna a solução da relação
 int compara_relacional(w_token * r, w_token * rel, w_token * t2);
 
+//  Função para validar nome e atributos de tabelas
 int tableName_test(w_token * token_list, char nomeTabela[]);

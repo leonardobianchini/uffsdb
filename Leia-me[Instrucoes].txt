@@ -315,7 +315,7 @@ Para isso, basta executar o comando 'make' no bash quando estiver na pasta onde 
 
 Para compilar o projeto inteiro, basta executar o comando 'make' na pasta /Fonte/. Isso irá gerar o executável 'Ibetres'.
 
-Ao executar, o programa conecta-se com o banco "ibetres" por default, 
+Ao executar, o programa conecta-se com o banco "ibetres" por default,
 Para conectar-se a outro banco, utiliza-se o comando:
 	\c <nomedo banco>.
 
@@ -346,6 +346,46 @@ A ordem das colunas especificadas não precisa ser na mesma ordem da criação e
 não especificar a coluna o SGBD colocará um valor nulo, de acordo com o tipo de dado.
 
 Os comandos SQL e os objetos das relações (i.e. <NomeTabelas>, <NomeCampos> ...) NÃO são case-sensitive.
-	ex: 
+	ex:
 		<TABELA> e <tabela> se referem a mesma relação.
 		<INSERT> e <insert> se referem ao mesmo comando SQL.
+
+
+##############LEIA-ME PARTE 5 #############################################################################################################
+
+=> 07 de julho de 2016 <=
+
+Universidade Federal da Fronteira Sul – UFFS
+Curso: Ciência da Computação
+Componente Curricular: Banco de Dados II
+Professor: Dr. Denio Duarte
+Alunos: João Carlos Becker (1411100040), Leonardo Bianchini(1411100015), Marco Aurélio Alves Puton(1411100022).
+=============================================================================================================================================
+
+O reconhecedor sintático e semântico das cláusulas de projeção foram verificas pelo lex e yacc, os mesmos se fazem necessarios.
+A sintaxe da projeção está no formato:
+select <nomeTabela>.<nomeColuna>, <nomeTabela>.<nomeColuna2>, ... from <nomeTabela>; ou
+select * from <nomeTabela>;
+
+A sintaxe da seleção está no formato:
+where <objeto> <operadorRelacional> <objeto>; ou
+where <objeto> <operadorRelacional> <objeto> <OperadorLógico> <objeto> <operadorRelacional> <objeto> ... ;
+
+sendo <objeto> um operando relaciona, que pode ser uma operação aritmética, um valor ou um <nomeTabela>.<nomeColuna>
+
+A precedência nas operações é sempre da esquerda para a direita;
+
+Operações aritméticas:	soma 			+
+						subtração		-
+						multiplicação	*
+						divisão			/
+
+Operações lógicas:	and e or
+
+Operações relacionais:	igualdade		=
+						diferença		!=
+						maior			>
+						menor			<
+						maior ou igual	>=
+						menor ou igual	<=
+						
