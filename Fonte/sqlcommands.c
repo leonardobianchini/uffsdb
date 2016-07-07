@@ -668,6 +668,18 @@ int inList(column *a, column *b){
 	return 0;
 }
 
+void print_wtoken(w_token* a){
+    if(a){
+        if(a->tipo == 1)
+            printf("%d", *(int *)a->valor);
+        else if(a->tipo == 3)
+            printf("%s", (char*)a->valor);
+        else if(a->tipo == 2 || a->tipo == 10)
+            printf("%lf", *(double *)a->valor);
+        else
+            printf("%s", (char*)a->valor);
+    }
+}
 
 //  Função linda e maravilhosa que substitui os valores dos atributos no token_list
 w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
@@ -737,9 +749,16 @@ w_token * subs_tokens(w_token * token_list, column * tupla, int nAttr){
         else{
             d = (w_token *)malloc(sizeof(w_token));
             d->tipo = p->tipo;
-            d->valor=(void *)malloc(sizeof(p->valor));
-            memset(d->valor,0,sizeof(p->valor));
-            strcpy(d->valor, p->valor);
+            if(p->tipo==3){
+                d->valor=(void *)malloc(strlen(p->valor));
+                strcpy(d->valor, p->valor);
+            }else{
+                d->valor=(void *)malloc(sizeof(p->valor));
+                memset(d->valor,0,sizeof(p->valor));
+                memcpy(d->valor, p->valor, sizeof(p->valor));
+
+            }
+
             d->next = NULL;
             l = insert_token(l, d);
         }
@@ -764,7 +783,9 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
 	if(pages == NULL)
 		return NULL;
 
-
+    
+    
+    
 	for(i = 0; i < num; i++){
 
         if(i%nAttr == 0){
@@ -781,37 +802,13 @@ column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_to
                 if(alternaList == NULL ){
                     return NULL;
                 }
+/*                w_token *ind=NULL;
+                for(ind = alternaList; ind; ind = ind->next){
+                   print_wtoken(ind);
+                }
+                printf("\n");
+*/                
             }
-
-            // Chamar a função do becker aqui
-/*            w_token *ind=NULL;
-//          printf("comeca aqui\n");
-            for(ind = alternaList; ind; ind = ind->next){
-                if(ind->tipo == 1)
-                    printf("%d", *(int *)ind->valor);
-                else if(ind->tipo == 3)
-                    printf("%s", (char*)ind->valor);
-                else if(ind->tipo == 2 || ind->tipo == 10)
-                    printf("%lf", *(double *)ind->valor);
-                else
-                    printf("%s", (char*)ind->valor);
-            }
-            printf("\n");
-*/
-
-
-            /*
-            for(j = 0; j < nAttr; j++){
-                if(tupla[j].tipoCampo == 'I')
-                    printf("ValorTupla%d: %d\n", j, *(int *)tupla[j].valorCampo);
-                else if(tupla[j].tipoCampo == 'S')
-                    printf("ValorTupla%d: %s\n", j, tupla[j].valorCampo);
-                else if(tupla[j].tipoCampo == 'D')
-                    printf("ValorTupla%d: %lf\n", j, *(double *)tupla[j].valorCampo);
-                else if(tupla[j].tipoCampo == 'C')
-                    printf("ValorTupla%d: %c\n", j, tupla[j].valorCampo[0]);
-
-            }*/
         }
 		if(inList(&p[i], attr)){
 			novo = (column *)malloc(sizeof(column));

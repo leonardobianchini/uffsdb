@@ -84,7 +84,7 @@ void getToken(char * token, int type){
         novo->valor = c;
     }
     else{
-        novo->valor=(void *)malloc(sizeof(token));
+        novo->valor=(void *)malloc(strlen(token));
         strcpy(novo->valor,token);
     }
     insert_token_list(novo);

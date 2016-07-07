@@ -103,6 +103,8 @@ int verifyFK(char *, char *);
 
 void imprime2(char nomeTabela[], column * l, w_token * token_list);
 
+void print_wtoken(w_token* a);//função para debug
+
 column * select_list(column * pages, column * attr, int nAttr, int nTuplas, w_token * token_list);
 
 int inList(column *a, column *b);
